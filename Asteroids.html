@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test</title>
+</head>
+<style type="text/css">
+	html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+	}
+	canvas {
+		width: 100%;
+		height: 100%;
+		margin-bottom: 0px;
+		cursor: none;
+	}
+</style>
+<body>
+<canvas id="canvas" onclick="turnGravity()" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)"> </canvas>
+<script type="text/javascript">
+	canvas = document.getElementById("canvas");
+	ctx = canvas.getContext("2d");
+
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+
+	window.onresize = resize();
+
+	function resize() {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	}
+
+clearArea();
+	ctx.font = "70px Serif";
+	ctx.shadowBlur=20;
+	ctx.shadowColor = new Color(255, 255, 255).makeColor(1);
+	ctx.strokeStyle = new Color(255, 255, 255).makeColor(1);
+	ctx.strokeText("Hello World", 500, 200);
+
+	var n = 0, maxBalls = 15;
+	var gamePieces = [];
+	var mouseX = -1;
+	var mouseY = -1;
+	var gravityOn = false;
+	var shooteShape = "POLYGON";
+	var gameState = "opening"
+	var myShooter = new shooter(100, 100, shooteShape, 6, new Color(255, 255, 255));
+	var keyPressed;
+
+	myShooter.draw(100, 100);
+
+
+	function Color(red, green, blue) {
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+		this.hex = red.toString(16)+green.toString(16)+blue.toString(16);
+		this.color = "rgba(0, 0, 0, 0)";
+
+		this.makeColor = function(opacity) {
+			this.color = "rgba("+red+", "+green+", "+blue+", "+opacity+")";
+			return this.color;
+		}
+
+		this.makeHexColor = function() {
+			return "#"+this.hex;
+		}
+	}
+
+	/*
+	pulisce l'area di gioco
+	*/
+	function clearArea() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle = 'rgb(50, 50, 70)'
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
+
+	function shooter(initial_x, initial_y, shape, sides, color) {
+		this.x = initial_x;
+		this.y = initial_y;
+		this.shape = shape;
+		this.color = color.makeColor(1);
+		this.sides = sides;
+		this.side = 10;
+
+		this.draw = function(x, y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
+
+	/*
+	aggiorna l'area di gioco con le nuove posizioni degli oggetti
+	*/
+	function updateArea() {
+		clearArea();
+	}
+
+
+	function updateMouseCoordinates(event) {
+		mouseX = event.clientX;
+		mouseY = event.clientY;
+	}
+
+	function drawShooter() {
+		switch(keyPressed) {
+			case 37:
+				myShooter.draw(myShooter.x-5, myShooter.y);
+				break;
+			case 38:
+				myShooter.draw(myShooter.x, myShooter.y-5);
+				break;
+			case 39:
+				myShooter.draw(myShooter.x+5, myShooter.y);
+				break;
+			case 40:
+				myShooter.draw(myShooter.x, myShooter.y+5);
+				break;
+		}
+	}
+
+	function keyPressed(event) {
+		keyPressed = event.keyCode();
+	}
+
+</script>
+</body>
+</html>
