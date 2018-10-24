@@ -32,25 +32,60 @@
 		canvas.height = window.innerHeight;
 	}
 
-clearArea();
-	ctx.font = "70px Serif";
-	ctx.shadowBlur=20;
-	ctx.shadowColor = new Color(255, 255, 255).makeColor(1);
-	ctx.strokeStyle = new Color(255, 255, 255).makeColor(1);
-	ctx.strokeText("Hello World", 500, 200);
-
-	var n = 0, maxBalls = 15;
-	var gamePieces = [];
 	var mouseX = -1;
 	var mouseY = -1;
-	var gravityOn = false;
 	var shooteShape = "POLYGON";
-	var gameState = "opening"
-	var myShooter = new shooter(100, 100, shooteShape, 6, new Color(255, 255, 255));
+	var gameState = null;
 	var keyPressed;
+	var title = null;
 
-	myShooter.draw(100, 100);
+	changeGameState("opening");
 
+	function changeGameState(newState) {
+		gameState = newState;
+		clearArea();
+		initializeObjects();
+		setListeners();
+	}
+
+	/*
+	pulisce l'area di gioco
+	*/
+	function clearArea() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle = 'rgb(0, 0, 0	)'
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
+
+	function drawArea() {
+		switch (gameState) {
+			case "opening":
+					title.draw(canvas.width/2-canvas.width/17, canvas.height/2+canvas.height/10, canvas.height/20);
+					break;
+			case "levels": break;
+			case "playing": break;
+		}
+	}
+
+	function initializeObjects() {
+		switch (gameState) {
+			case "opening":
+					title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), "Start game");
+					break;
+			case "levels": break;
+			case "playing": break;
+		}
+	}
+
+	function setListeners() {
+		switch (gameState) {
+			case "opening":
+					drawArea();
+					break;
+			case "levels": break;
+			case "playing": break;
+		}
+	}
 
 	function Color(red, green, blue) {
 		this.red = red;
@@ -69,56 +104,30 @@ clearArea();
 		}
 	}
 
-	/*
-	pulisce l'area di gioco
-	*/
-	function clearArea() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle = 'rgb(50, 50, 70)'
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-	}
-
-	function shooter(initial_x, initial_y, shape, sides, color) {
-		this.x = initial_x;
-		this.y = initial_y;
-		this.shape = shape;
+	function neonString(color, shadowColor, text) {
 		this.color = color.makeColor(1);
-		this.sides = sides;
-		this.side = 10;
+		this.shadowColor = shadowColor.makeColor(1);
+		this.text = text;
 
-		this.draw = function(x, y) {
-			this.x = x;
-			this.y = y;
+		this.draw = function(x, y, size) {
+				ctx.font = size+"px Serif";
+				ctx.shadowBlur = 10;
+				ctx.shadowColor = this.shadowColor;
+				ctx.shadowOffsetX = size/100;
+				ctx.shadowOffsetY = size/100;
+
+				//this.drawLight(x-size/600, y-size/600);
+				//this.drawLight(x+size/1200, y+size/1200);
+				this.drawLight(x-size/1200, y+size/1200);
+				this.drawLight(x+size/1200, y-size/1200);
+				ctx.strokeStyle = this.color;
+				ctx.strokeText(this.text, x, y);
 		}
-	}
 
-	/*
-	aggiorna l'area di gioco con le nuove posizioni degli oggetti
-	*/
-	function updateArea() {
-		clearArea();
-	}
-
-
-	function updateMouseCoordinates(event) {
-		mouseX = event.clientX;
-		mouseY = event.clientY;
-	}
-
-	function drawShooter() {
-		switch(keyPressed) {
-			case 37:
-				myShooter.draw(myShooter.x-5, myShooter.y);
-				break;
-			case 38:
-				myShooter.draw(myShooter.x, myShooter.y-5);
-				break;
-			case 39:
-				myShooter.draw(myShooter.x+5, myShooter.y);
-				break;
-			case 40:
-				myShooter.draw(myShooter.x, myShooter.y+5);
-				break;
+		this.drawLight = function(x, y) {
+			ctx.shadowColor = this.shadowColor;
+			ctx.strokeStyle = this.shadowColor;
+			ctx.strokeText(this.text, x, y);
 		}
 	}
 
