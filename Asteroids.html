@@ -34,13 +34,16 @@
 
 	var mouseX = -1;
 	var mouseY = -1;
-	var shooteShape = "POLYGON";
 	var gameState = null;
 	var keyPressed;
 	var title = null;
+	var lights = true;
 
 	changeGameState("opening");
 
+	/*
+	cambia lo stato del gioco
+	*/
 	function changeGameState(newState) {
 		gameState = newState;
 		clearArea();
@@ -53,20 +56,27 @@
 	*/
 	function clearArea() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle = 'rgb(0, 0, 0	)'
+		ctx.fillStyle = 'rgb(10, 10, 10)'
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 	}
 
+	/*
+	disegna l'area e gli elementi di gioco
+	*/
 	function drawArea() {
+		clearArea();
 		switch (gameState) {
 			case "opening":
-					title.draw(canvas.width/2-canvas.width/17, canvas.height/2+canvas.height/10, canvas.height/20);
+					title.draw(canvas.width/2-canvas.width/17, canvas.height/2+canvas.height/10, canvas.height/20, lights);
 					break;
 			case "levels": break;
 			case "playing": break;
 		}
 	}
 
+	/*
+	inizializza gli oggetti
+	*/
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
@@ -77,6 +87,9 @@
 		}
 	}
 
+	/*
+	imposta i listener per mouse e tastiera
+	*/
 	function setListeners() {
 		switch (gameState) {
 			case "opening":
@@ -87,6 +100,14 @@
 		}
 	}
 
+	
+	function roundRectange(x, y, width, height, color) {
+
+	}
+
+	/*
+	oggetto per generare colori
+	*/
 	function Color(red, green, blue) {
 		this.red = red;
 		this.green = green;
@@ -104,22 +125,27 @@
 		}
 	}
 
+	/*
+	stringa con effetto neon
+	*/
 	function neonString(color, shadowColor, text) {
 		this.color = color.makeColor(1);
 		this.shadowColor = shadowColor.makeColor(1);
 		this.text = text;
 
-		this.draw = function(x, y, size) {
+		this.draw = function(x, y, size, lights) {
 				ctx.font = size+"px Serif";
 				ctx.shadowBlur = 10;
 				ctx.shadowColor = this.shadowColor;
 				ctx.shadowOffsetX = size/100;
 				ctx.shadowOffsetY = size/100;
 
-				//this.drawLight(x-size/600, y-size/600);
-				//this.drawLight(x+size/1200, y+size/1200);
-				this.drawLight(x-size/1200, y+size/1200);
-				this.drawLight(x+size/1200, y-size/1200);
+				if (lights) {
+					//this.drawLight(x-size/600, y-size/600);
+					//this.drawLight(x+size/1200, y+size/1200);
+					this.drawLight(x-size/1200, y+size/1200);
+					this.drawLight(x+size/1200, y-size/1200);
+				}
 				ctx.strokeStyle = this.color;
 				ctx.strokeText(this.text, x, y);
 		}
@@ -131,6 +157,9 @@
 		}
 	}
 
+	/*
+	salva l'ultimo tasto premuto
+	*/
 	function keyPressed(event) {
 		keyPressed = event.keyCode();
 	}
