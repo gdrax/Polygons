@@ -13,11 +13,10 @@
 		width: 100%;
 		height: 100%;
 		margin-bottom: 0px;
-		cursor: none;
 	}
 </style>
 <body>
-<canvas id="canvas" onclick="turnGravity()" onkeypress="keyPressed(event)"> </canvas>
+<canvas id="canvas" onclick="turnGravity()" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)"> </canvas>
 <script type="text/javascript">
 	canvas = document.getElementById("canvas");
 	ctx = canvas.getContext("2d");
@@ -25,11 +24,10 @@
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
-	window.onresize = resize();
-
-	function resize() {
+	window.onresize = function resize() {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+		changeGameState(gameState);
 	}
 
 	var mouseX = -1;
@@ -38,7 +36,6 @@
 	var keyPressed;
 	var title = null;
 	var rectangle = null;
-	var lights = true;
 
 	changeGameState("opening");
 
@@ -49,7 +46,7 @@
 		gameState = newState;
 		clearArea();
 		initializeObjects();
-		setListeners();
+		startAnimation();
 	}
 
 	/*
@@ -68,9 +65,14 @@
 		clearArea();
 		switch (gameState) {
 			case "opening":
-					title.draw(canvas.width/2-canvas.width/17, canvas.height/2+canvas.height/10, canvas.height/20, lights);
-					rectangle.draw(200, 200);
-					break;
+				var titleX = canvas.width*15/34;
+				var titleY = canvas.height*3/5;
+				var rectangleX = titleX-title.size/10;
+				var rectangleY = titleY-title.size;
+				var lights = mouseInRectangle(rectangle.width, rectangle.height, rectangleX, rectangleY);
+				title.draw(titleX, titleY, lights, "Serif");
+				rectangle.draw(rectangleX, rectangleY);
+				break;
 			case "levels": break;
 			case "playing": break;
 		}
@@ -82,8 +84,8 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-					title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), "Start game");
-					rectangle = new roundRectange(100, 250, new Color(0, 255, 0));
+					title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), canvas.height/20, "Start game");
+					rectangle = new roundRectangle(ctx.measureText(title.text).width*title.size/11, title.size*1.5, new Color(0, 255, 0));
 					break;
 			case "levels": break;
 			case "playing": break;
@@ -93,10 +95,10 @@
 	/*
 	imposta i listener per mouse e tastiera
 	*/
-	function setListeners() {
+	function startAnimation() {
 		switch (gameState) {
 			case "opening":
-					drawArea();
+					setInterval(drawArea, 20);
 					break;
 			case "levels": break;
 			case "playing": break;
@@ -104,7 +106,7 @@
 	}
 
 
-	function roundRectange(width, height, color) {
+	function roundRectangle(width, height, color) {
 		this.width = width;
 		this.height = height;
 		this.color = color.makeColor(1);
@@ -125,7 +127,7 @@
 			ctx.strokeStyle = this.color;
 			ctx.stroke();
 		}
-	}
+}
 
 	/*
 	oggetto per generare colori
@@ -150,26 +152,30 @@
 	/*
 	stringa con effetto neon
 	*/
-	function neonString(color, shadowColor, text) {
+	function neonString(color, shadowColor, size, text) {
 		this.color = color.makeColor(1);
 		this.shadowColor = shadowColor.makeColor(1);
 		this.text = text;
+		this.x = null;
+		this.y = null;
+		this.size = size;
 
-		this.draw = function(x, y, size, lights) {
-				ctx.font = size+"px Serif";
-				ctx.shadowBlur = 10;
-				ctx.shadowColor = this.shadowColor;
-				ctx.shadowOffsetX = size/100;
-				ctx.shadowOffsetY = size/100;
-
-				if (lights) {
-					//this.drawLight(x-size/600, y-size/600);
-					//this.drawLight(x+size/1200, y+size/1200);
-					this.drawLight(x-size/1200, y+size/1200);
-					this.drawLight(x+size/1200, y-size/1200);
-				}
-				ctx.strokeStyle = this.color;
-				ctx.strokeText(this.text, x, y);
+		this.draw = function(x, y, lights, font) {
+			this.x = x;
+			this.y = y;
+			ctx.font = this.size+"px "+font;
+			ctx.shadowBlur = 10;
+			ctx.shadowColor = this.shadowColor;
+			ctx.shadowOffsetX = this.size/100;
+			ctx.shadowOffsetY = this.size/100;
+			if (lights) {
+				//this.drawLight(x-this.size/600, y-this.size/600);
+				//this.drawLight(x+this.size/1200, y+this.size/1200);
+				this.drawLight(x-this.size/1200, y+this.size/1200);
+				this.drawLight(x+this.size/1200, y-this.size/1200);
+			}
+			ctx.strokeStyle = this.color;
+			ctx.strokeText(this.text, x, y);
 		}
 
 		this.drawLight = function(x, y) {
@@ -184,6 +190,22 @@
 	*/
 	function keyPressed(event) {
 		keyPressed = event.keyCode();
+	}
+
+	/*
+	aggiorna la posizione del muose quando si muove
+	*/
+	function updateMouseCoordinates(event) {
+		mouseX = event.clientX;
+		mouseY = event.clientY;
+	}
+
+	function mouseInRectangle(width, height, x, y) {
+		if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
+			return true;
+		}
+		else
+			return false;
 	}
 
 </script>
