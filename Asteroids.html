@@ -17,7 +17,7 @@
 	}
 </style>
 <body>
-<canvas id="canvas" onclick="turnGravity()" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)"> </canvas>
+<canvas id="canvas" onclick="turnGravity()" onkeypress="keyPressed(event)"> </canvas>
 <script type="text/javascript">
 	canvas = document.getElementById("canvas");
 	ctx = canvas.getContext("2d");
@@ -37,6 +37,7 @@
 	var gameState = null;
 	var keyPressed;
 	var title = null;
+	var rectangle = null;
 	var lights = true;
 
 	changeGameState("opening");
@@ -68,6 +69,7 @@
 		switch (gameState) {
 			case "opening":
 					title.draw(canvas.width/2-canvas.width/17, canvas.height/2+canvas.height/10, canvas.height/20, lights);
+					rectangle.draw(200, 200);
 					break;
 			case "levels": break;
 			case "playing": break;
@@ -81,6 +83,7 @@
 		switch (gameState) {
 			case "opening":
 					title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), "Start game");
+					rectangle = new roundRectange(100, 250, new Color(0, 255, 0));
 					break;
 			case "levels": break;
 			case "playing": break;
@@ -100,9 +103,28 @@
 		}
 	}
 
-	
-	function roundRectange(x, y, width, height, color) {
 
+	function roundRectange(width, height, color) {
+		this.width = width;
+		this.height = height;
+		this.color = color.makeColor(1);
+		this.radius = 10;
+
+		this.draw = function(x, y) {
+			ctx.beginPath();
+			ctx.moveTo(x + this.radius, y);
+			ctx.lineTo(x + this.width - this.radius, y);
+			ctx.quadraticCurveTo(x + this.width, y, x + this.width, y + this.radius);
+			ctx.lineTo(x + this.width, y + this.height - this.radius);
+			ctx.quadraticCurveTo(x + this.width, y + this.height, x + this.width - this.radius, y + this.height);
+			ctx.lineTo(x + this.radius, y + this.height);
+			ctx.quadraticCurveTo(x, y + this.height, x, y + this.height - this.radius);
+			ctx.lineTo(x, y + this.radius);
+			ctx.quadraticCurveTo(x, y, x + this.radius, y);
+			ctx.closePath();
+			ctx.strokeStyle = this.color;
+			ctx.stroke();
+		}
 	}
 
 	/*
