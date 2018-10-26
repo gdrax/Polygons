@@ -80,6 +80,7 @@
 				title.draw(titleX, titleY, lights, "Serif");
 				titleRect.draw(rectX, rectY);
 				break;
+
 			case "levels":
 				var levelNameX = canvas.width*15/34;
 				var levelNameY = canvas.height*4/5;
@@ -89,6 +90,7 @@
 				levelName.draw(levelNameX,  levelNameY, lights, "Serif");
 				levelNameRect.draw(rectX, rectY);
 				levelRect.draw(canvas.width/6, canvas.width/8);
+				levelRect.drawArrows();
 				break;
 			case "playing": break;
 		}
@@ -141,6 +143,8 @@
 		this.draw = function(x, y) {
 			this.x = x;
 			this.y = y;
+			ctx.shadowBlur = 10;
+			ctx.shadowColor = this.color;
 			ctx.beginPath();
 			ctx.moveTo(x + this.radius, y);
 			ctx.lineTo(x + this.width - this.radius, y);
@@ -153,6 +157,25 @@
 			ctx.quadraticCurveTo(x, y, x + this.radius, y);
 			ctx.closePath();
 			ctx.strokeStyle = this.color;
+			ctx.stroke();
+		}
+
+		this.drawArrows = function() {
+			ctx.shadowBlur = 10;
+			ctx.shadowColor = this.color;
+			ctx.strokeStyle = this.color;
+			//freccia a destra
+			ctx.beginPath();
+			ctx.moveTo(this.x + this.width + this.width/33, this.y + this.height/2 - this.width/33);
+			ctx.lineTo(this.x + this.width + this.width/16.5, this.y + this.height/2);
+			ctx.lineTo(this.x + this.width + this.width/33, this.y +this.height/2 + this.width/33);
+			ctx.stroke();
+
+			//freccia a sinistra
+			ctx.beginPath();
+			ctx.moveTo(this.x - this.width/33, this.y + this.height/2 - this.width/33);
+			ctx.lineTo(this.x - this.width/16.5, this.y + this.height/2);
+			ctx.lineTo(this.x - this.width/33, this.y +this.height/2 + this.width/33);
 			ctx.stroke();
 		}
 	}
