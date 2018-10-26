@@ -72,25 +72,21 @@
 		clearArea();
 		switch (gameState) {
 			case "opening":
-				var titleX = canvas.width*7/17;
-				var titleY = canvas.height*3/5;
+				var titleX = canvas.width*7/16;
+				var titleY = canvas.height/2;
 				var rectX = titleX-title.size/10;
 				var rectY = titleY-title.size;
-				var lights = mouseInRectangle(titleRect.width, titleRect.height, rectX, rectY);
+				var lights = titleRect.drawWithLights(rectX, rectY);
 				title.draw(titleX, titleY, lights, "Serif");
-				titleRect.draw(rectX, rectY);
 				break;
 
 			case "levels":
 				var levelNameX = canvas.width*15/34;
 				var levelNameY = canvas.height*4/5;
-				var rectX = levelNameX-levelName.size/10;
-				var rectY = levelNameY-levelName.size;
-				var lights = mouseInRectangle(levelNameRect.width, levelNameRect.height, rectX, rectY);
+				var lights = levelNameRect.drawWithLights(levelNameX-levelName.size/10, levelNameY-levelName.size);
 				levelName.draw(levelNameX,  levelNameY, lights, "Serif");
-				levelNameRect.draw(rectX, rectY);
-				levelRect.draw(canvas.width/6, canvas.width/8);
-				levelRect.drawArrows();
+				levelRect.drawWithLights(canvas.width/6, canvas.height/8);
+				levelRect.drawArrowsWithLights	();
 				break;
 			case "playing": break;
 		}
@@ -132,19 +128,19 @@
 	}
 
 
-	function roundRectangle(width, height, color) {
+	function roundRectangle(width, height, shadowColor) {
 		this.width = width;
 		this.height = height;
-		this.color = color.makeColor(1);
+		this.shadowColor = shadowColor.makeColor(1);
+		this.color = new Color(255, 255, 255).makeColor(1);
 		this.radius = 10;
 		this.x = null;
 		this.y = null;
+		this.arrowOffsetX = null;
 
-		this.draw = function(x, y) {
-			this.x = x;
-			this.y = y;
+		this.draw = function(x, y, shadows) {
 			ctx.shadowBlur = 10;
-			ctx.shadowColor = this.color;
+			ctx.shadowColor = this.shadowColor;
 			ctx.beginPath();
 			ctx.moveTo(x + this.radius, y);
 			ctx.lineTo(x + this.width - this.radius, y);
@@ -156,27 +152,71 @@
 			ctx.lineTo(x, y + this.radius);
 			ctx.quadraticCurveTo(x, y, x + this.radius, y);
 			ctx.closePath();
-			ctx.strokeStyle = this.color;
+			if (shadows)
+				ctx.strokeStyle = this.shadowColor;
+			else
+				ctx.strokeStyle = this.color;
 			ctx.stroke();
 		}
 
-		this.drawArrows = function() {
+		this.drawWithLights = function(x, y) {
+			this.x = x;
+			this.y = y;
+			var shadows = mouseInRectangle(this.width, this.height, this.x, this.y);
+			if (shadows) {
+				this.draw(x-x/500, y+y/500, true);
+				this.draw(x+x/500, y+y/500, true);
+			}
+			this.draw(x, y, false);
+			return shadows;
+		}
+
+		this.drawLeftArrow = function(s, shadows) {
 			ctx.shadowBlur = 10;
-			ctx.shadowColor = this.color;
-			ctx.strokeStyle = this.color;
-			//freccia a destra
-			ctx.beginPath();
-			ctx.moveTo(this.x + this.width + this.width/33, this.y + this.height/2 - this.width/33);
-			ctx.lineTo(this.x + this.width + this.width/16.5, this.y + this.height/2);
-			ctx.lineTo(this.x + this.width + this.width/33, this.y +this.height/2 + this.width/33);
-			ctx.stroke();
+			if (shadows)
+				ctx.strokeStyle = this.shadowColor;
+			else
+				ctx.strokeStyle = this.color;
+			ctx.shadowColor = this.shadowColor;
 
 			//freccia a sinistra
 			ctx.beginPath();
-			ctx.moveTo(this.x - this.width/33, this.y + this.height/2 - this.width/33);
-			ctx.lineTo(this.x - this.width/16.5, this.y + this.height/2);
-			ctx.lineTo(this.x - this.width/33, this.y +this.height/2 + this.width/33);
+			ctx.moveTo(this.x - this.width/33 - s, this.y + this.height/2 - this.width/33 + s);
+			ctx.lineTo(this.x - this.width/16.5 - s, this.y + this.height/2 + s);
+			ctx.lineTo(this.x - this.width/33 - s, this.y +this.height/2 + this.width/33 + s);
+			ctx.lineTo(this.x - this.width/33 - s, this.y + this.height/2 - this.width/33 + s);
 			ctx.stroke();
+		}
+
+		this.drawRightArrow = function(s, shadows) {
+			ctx.shadowBlur = 10;
+			if (shadows)
+				ctx.strokeStyle = this.shadowColor;
+			else
+				ctx.strokeStyle = this.color;
+			ctx.shadowColor = this.shadowColor;
+
+			//freccia a destra
+			ctx.beginPath();
+			ctx.moveTo(this.x + this.width + this.width/33 + s, this.y + this.height/2 - this.width/33 - s);
+			ctx.lineTo(this.x + this.width + this.width/16.5 + s, this.y + this.height/2 - s);
+			ctx.lineTo(this.x + this.width + this.width/33 + s, this.y +this.height/2 + this.width/33 - s);
+			ctx.lineTo(this.x + this.width + this.width/33 + s, this.y + this.height/2 - this.width/33 - s);
+			ctx.stroke();
+		}
+
+		this.drawArrowsWithLights = function() {
+			this.arrowOffsetX = this.width/33;
+			if (mouseInLeftArrow(this)) {
+				this.drawLeftArrows(this.height/500, true);
+				this.drawLeftArrows(-this.height/500, true);
+			}
+			if (mouseInRightArrow(this)) {
+				this.drawRightArrow(this.height/500, true);
+				this.drawRightArrow(-this.height/500, true)
+			}
+			this.drawLeftArrow(0, false);
+			this.drawRightArrow(0, false);
 		}
 	}
 
@@ -254,6 +294,7 @@
 	function mouseClick() {
 		switch(gameState) {
 			case "opening":
+				//con il click su "Start game" passo ai livelli
 				if (mouseInRectangle(titleRect.width, titleRect.height, titleRect.x, titleRect.y)) {
 					gameState = "levels";
 					changeGameState("levels");
@@ -270,6 +311,22 @@
 		if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
 			return true;
 		}
+		else
+			return false;
+	}
+
+
+	//TODO: vincoli per apparteneza a trianglo
+	function mouseInLeftArrow(rect) {
+		if (mouseX <= rect.x - rect.arrowOffsetX && )
+			return true;
+		else
+			return false;
+	}
+
+	function mouseInRightArrow(rect) {
+		if (mouseX )
+			return true;
 		else
 			return false;
 	}
