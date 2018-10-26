@@ -8,6 +8,7 @@
 			width: 100%;
 			height: 100%;
 			margin: 0px;
+			overflow: hidden;
 	}
 	canvas {
 		width: 100%;
@@ -16,7 +17,7 @@
 	}
 </style>
 <body>
-<canvas id="canvas" onclick="turnGravity()" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)"> </canvas>
+<canvas id="canvas" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)" onclick="mouseClick()"> </canvas>
 <script type="text/javascript">
 	canvas = document.getElementById("canvas");
 	ctx = canvas.getContext("2d");
@@ -30,12 +31,18 @@
 		changeGameState(gameState);
 	}
 
+	//TODO: make unique object for writings inside a rectangle
+
 	var mouseX = -1;
 	var mouseY = -1;
 	var gameState = null;
 	var keyPressed;
 	var title = null;
-	var rectangle = null;
+	var titleRect = null;
+	var levelNameRect = null;
+	var levelRect = null;
+	var levelNumber = 1;
+	var currentLevel = null;
 
 	changeGameState("opening");
 
@@ -65,15 +72,24 @@
 		clearArea();
 		switch (gameState) {
 			case "opening":
-				var titleX = canvas.width*15/34;
+				var titleX = canvas.width*7/17;
 				var titleY = canvas.height*3/5;
-				var rectangleX = titleX-title.size/10;
-				var rectangleY = titleY-title.size;
-				var lights = mouseInRectangle(rectangle.width, rectangle.height, rectangleX, rectangleY);
+				var rectX = titleX-title.size/10;
+				var rectY = titleY-title.size;
+				var lights = mouseInRectangle(titleRect.width, titleRect.height, rectX, rectY);
 				title.draw(titleX, titleY, lights, "Serif");
-				rectangle.draw(rectangleX, rectangleY);
+				titleRect.draw(rectX, rectY);
 				break;
-			case "levels": break;
+			case "levels":
+				var levelNameX = canvas.width*15/34;
+				var levelNameY = canvas.height*4/5;
+				var rectX = levelNameX-levelName.size/10;
+				var rectY = levelNameY-levelName.size;
+				var lights = mouseInRectangle(levelNameRect.width, levelNameRect.height, rectX, rectY);
+				levelName.draw(levelNameX,  levelNameY, lights, "Serif");
+				levelNameRect.draw(rectX, rectY);
+				levelRect.draw(canvas.width/6, canvas.width/8);
+				break;
 			case "playing": break;
 		}
 	}
@@ -84,10 +100,16 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-					title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), canvas.height/20, "Start game");
-					rectangle = new roundRectangle(ctx.measureText(title.text).width*title.size/11, title.size*1.5, new Color(0, 255, 0));
-					break;
-			case "levels": break;
+				title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), canvas.height/20, "Start game");
+				titleRect = new roundRectangle(ctx.measureText(title.text).width*title.size/10.8, title.size*1.5, new Color(0, 255, 0));
+				break;
+			case "levels":
+				currentLevel = "Level "+levelNumber;
+				levelName = new neonString(new Color(255, 255, 255), new Color(255, 255, 0), canvas.height/20, currentLevel);
+				//TODO: rettangolo lunghissimo quando si cambia stato
+				levelNameRect = new roundRectangle(ctx.measureText(levelName.text).width*levelName.size/10, levelName.size*1.5, new Color(255, 255, 0));
+				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new Color(255, 255, 0));
+				break;
 			case "playing": break;
 		}
 	}
@@ -98,9 +120,11 @@
 	function startAnimation() {
 		switch (gameState) {
 			case "opening":
-					setInterval(drawArea, 20);
-					break;
-			case "levels": break;
+				setInterval(drawArea, 20);
+				break;
+			case "levels":
+				setInterval(drawArea, 20);
+				break;
 			case "playing": break;
 		}
 	}
@@ -111,8 +135,12 @@
 		this.height = height;
 		this.color = color.makeColor(1);
 		this.radius = 10;
+		this.x = null;
+		this.y = null;
 
 		this.draw = function(x, y) {
+			this.x = x;
+			this.y = y;
 			ctx.beginPath();
 			ctx.moveTo(x + this.radius, y);
 			ctx.lineTo(x + this.width - this.radius, y);
@@ -127,7 +155,7 @@
 			ctx.strokeStyle = this.color;
 			ctx.stroke();
 		}
-}
+	}
 
 	/*
 	oggetto per generare colori
@@ -198,6 +226,21 @@
 	function updateMouseCoordinates(event) {
 		mouseX = event.clientX;
 		mouseY = event.clientY;
+	}
+
+	function mouseClick() {
+		switch(gameState) {
+			case "opening":
+				if (mouseInRectangle(titleRect.width, titleRect.height, titleRect.x, titleRect.y)) {
+					gameState = "levels";
+					changeGameState("levels");
+				}
+			break;
+			case "levels":
+				break;
+			case "playing":
+				break
+		}
 	}
 
 	function mouseInRectangle(width, height, x, y) {
