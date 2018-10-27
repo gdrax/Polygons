@@ -42,6 +42,8 @@
 	var levelRect = null;
 	var levelNumber = 1;
 	var currentLevel = null;
+	var firstLevel = 1;
+	var lastLevel = 10;
 
 	changeGameState("opening");
 
@@ -68,9 +70,12 @@
 	disegna l'area e gli elementi di gioco
 	*/
 	function drawArea() {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
 		clearArea();
 		switch (gameState) {
 			case "opening":
+				title.setText("Start game");
 				var titlePoint = new point(canvas.width*7/16, canvas.height/2);
 				var rectPoint = new point(titlePoint.x-title.size/10, titlePoint.y-title.size);
 				var lights = titleRect.drawWithLights(rectPoint);
@@ -78,7 +83,10 @@
 				break;
 
 			case "levels":
+				currentLevel = "Level "+levelNumber;
+				levelName.setText(currentLevel);
 				var levelNamePoint = new point(canvas.width*15/34, canvas.height*4/5);
+				levelNameRect.setWidth(ctx.measureText(levelName.text).width*levelName.size/10);
 				var lights = levelNameRect.drawWithLights(new point(levelNamePoint.x-levelName.size/10, levelNamePoint.y-levelName.size));
 				levelName.draw(levelNamePoint, lights, "Serif");
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
@@ -94,13 +102,14 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-				title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), canvas.height/20, "Start game");
+				title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), canvas.height/20);
+				title.setText("Start game");
 				titleRect = new roundRectangle(ctx.measureText(title.text).width*title.size/10.8, title.size*1.5, new Color(0, 255, 0));
 				break;
 			case "levels":
 				currentLevel = "Level "+levelNumber;
-				levelName = new neonString(new Color(255, 255, 255), new Color(255, 255, 0), canvas.height/20, currentLevel);
-				//TODO: rettangolo lunghissimo quando si cambia stato
+				levelName = new neonString(new Color(255, 255, 255), new Color(255, 255, 0), canvas.height/20);
+				levelName.setText(currentLevel);
 				levelNameRect = new roundRectangle(ctx.measureText(levelName.text).width*levelName.size/10, levelName.size*1.5, new Color(255, 255, 0));
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new Color(255, 255, 0));
 				break;
@@ -137,6 +146,18 @@
 		this.x = null;
 		this.y = null;
 		this.arrowOffsetX = null;
+		this.leftp1 = null;
+		this.leftp2 = null;
+		this.leftp3 = null;
+		this.rightp1 = null;
+		this.rightp2 = null;
+		this.rightp3 = null;
+		this.leftArrow = false;
+		this.rightArrow = true;
+
+		this.setWidth = function(width) {
+			this.width = width;
+		}
 
 		this.draw = function(point, shadows) {
 			ctx.shadowBlur = 10;
@@ -190,23 +211,26 @@
 
 		this.drawArrowsWithLights = function() {
 			this.arrowOffsetX = this.width/20;
-			var leftp1 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
-			var leftp2 = new point(this.x - this.arrowOffsetX*2, this.y + this.height/2);
-			var leftp3 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
-			var rightp1 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
-			var rightp2 = new point(this.x + this.width + this.arrowOffsetX*2, this.y + this.height/2);
-			var rightp3 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
+			this.leftp1 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
+			this.leftp2 = new point(this.x - this.arrowOffsetX*2, this.y + this.height/2);
+			this.leftp3 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
+			this.rightp1 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
+			this.rightp2 = new point(this.x + this.width + this.arrowOffsetX*2, this.y + this.height/2);
+			this.rightp3 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
 
-			if (mouseInTriangle(leftp1, leftp2, leftp3)) {
-				this.drawArrow(leftp1, leftp2, leftp3, this.height/1000, true);
-				this.drawArrow(leftp1, leftp2, leftp3, -this.height/1000, true);
+			if (mouseInTriangle(this.leftp1, this.leftp2, this.leftp3) && this.leftArrow) {
+				this.drawArrow(this.leftp1, this.leftp2, this.leftp3, this.height/1000, true);
+				this.drawArrow(this.leftp1, this.leftp2, this.leftp3, -this.height/1000, true);
 			}
-			if (mouseInTriangle(rightp1, rightp2, rightp3)) {
-				this.drawArrow(rightp1, rightp2, rightp3, this.height/1000, true);
-				this.drawArrow(rightp1, rightp2, rightp3, -this.height/1000, true)
+			if (mouseInTriangle(this.rightp1, this.rightp2, this.rightp3) && this.rightArrow) {
+				this.drawArrow(this.rightp1, this.rightp2, this.rightp3, this.height/1000, true);
+				this.drawArrow(this.rightp1, this.rightp2, this.rightp3, -this.height/1000, true)
 			}
-			this.drawArrow(leftp1, leftp2, leftp3, 0, false);
-			this.drawArrow(rightp1, rightp2, rightp3, 0, false);
+
+			if (this.leftArrow)
+				this.drawArrow(this.leftp1, this.leftp2, this.leftp3, 0, false);
+			if (this.rightArrow)
+				this.drawArrow(this.rightp1, this.rightp2, this.rightp3, 0, false);
 		}
 	}
 
@@ -233,10 +257,10 @@
 	/*
 	stringa con effetto neon
 	*/
-	function neonString(color, shadowColor, size, text) {
+	function neonString(color, shadowColor, size) {
 		this.color = color.makeColor(1);
 		this.shadowColor = shadowColor.makeColor(1);
-		this.text = text;
+		this.text = null;
 		this.x = null;
 		this.y = null;
 		this.size = size;
@@ -264,6 +288,10 @@
 			ctx.strokeStyle = this.shadowColor;
 			ctx.strokeText(this.text, point.x, point.y);
 		}
+
+		this.setText = function(text) {
+			this.text = text;
+		}
 	}
 
 	/*
@@ -285,14 +313,45 @@
 			case "opening":
 				//con il click su "Start game" passo ai livelli
 				if (mouseInRectangle(titleRect.width, titleRect.height, titleRect.x, titleRect.y)) {
-					gameState = "levels";
 					changeGameState("levels");
 				}
 			break;
 			case "levels":
+				//click sulla freccia di sinistra
+				if (mouseInTriangle(levelRect.leftp1, levelRect.leftp2, levelRect.leftp3)) {
+					if (levelNumber > firstLevel) {
+						levelNumber--;
+						updateArrows();
+						drawArea();
+					}
+				}
+				//click sulla freccia di destra
+				else if (mouseInTriangle(levelRect.rightp1, levelRect.rightp2, levelRect.rightp3)) {
+					if (levelNumber < lastLevel) {
+						levelNumber++;
+						updateArrows();
+						drawArea();
+					}
+				}
 				break;
 			case "playing":
 				break
+		}
+	}
+
+	function updateArrows() {
+		switch(levelNumber) {
+			case 1:
+				levelRect.leftArrow = false;
+				levelRect.rightArrow = true;
+				break;
+			case 10:
+				levelRect.leftArrow = true;
+				levelRect.rightArrow = false;
+				break;
+			default:
+				levelRect.leftArrow = true;
+				levelRect.rightArrow = true;
 		}
 	}
 
