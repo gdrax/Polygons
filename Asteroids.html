@@ -33,8 +33,7 @@
 
 	//TODO: make unique object for writings inside a rectangle
 
-	var mouseX = -1;
-	var mouseY = -1;
+	var mousePoint = new point(0, 0);
 	var gameState = null;
 	var keyPressed;
 	var title = null;
@@ -72,21 +71,18 @@
 		clearArea();
 		switch (gameState) {
 			case "opening":
-				var titleX = canvas.width*7/16;
-				var titleY = canvas.height/2;
-				var rectX = titleX-title.size/10;
-				var rectY = titleY-title.size;
-				var lights = titleRect.drawWithLights(rectX, rectY);
-				title.draw(titleX, titleY, lights, "Serif");
+				var titlePoint = new point(canvas.width*7/16, canvas.height/2);
+				var rectPoint = new point(titlePoint.x-title.size/10, titlePoint.y-title.size);
+				var lights = titleRect.drawWithLights(rectPoint);
+				title.draw(titlePoint, lights, "Serif");
 				break;
 
 			case "levels":
-				var levelNameX = canvas.width*15/34;
-				var levelNameY = canvas.height*4/5;
-				var lights = levelNameRect.drawWithLights(levelNameX-levelName.size/10, levelNameY-levelName.size);
-				levelName.draw(levelNameX,  levelNameY, lights, "Serif");
-				levelRect.drawWithLights(canvas.width/6, canvas.height/8);
-				levelRect.drawArrowsWithLights	();
+				var levelNamePoint = new point(canvas.width*15/34, canvas.height*4/5);
+				var lights = levelNameRect.drawWithLights(new point(levelNamePoint.x-levelName.size/10, levelNamePoint.y-levelName.size));
+				levelName.draw(levelNamePoint, lights, "Serif");
+				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
+				levelRect.drawArrowsWithLights();
 				break;
 			case "playing": break;
 		}
@@ -127,6 +123,10 @@
 		}
 	}
 
+	function point(x, y) {
+		this.x = x;
+		this.y = y;
+	}
 
 	function roundRectangle(width, height, shadowColor) {
 		this.width = width;
@@ -138,19 +138,19 @@
 		this.y = null;
 		this.arrowOffsetX = null;
 
-		this.draw = function(x, y, shadows) {
+		this.draw = function(point, shadows) {
 			ctx.shadowBlur = 10;
 			ctx.shadowColor = this.shadowColor;
 			ctx.beginPath();
-			ctx.moveTo(x + this.radius, y);
-			ctx.lineTo(x + this.width - this.radius, y);
-			ctx.quadraticCurveTo(x + this.width, y, x + this.width, y + this.radius);
-			ctx.lineTo(x + this.width, y + this.height - this.radius);
-			ctx.quadraticCurveTo(x + this.width, y + this.height, x + this.width - this.radius, y + this.height);
-			ctx.lineTo(x + this.radius, y + this.height);
-			ctx.quadraticCurveTo(x, y + this.height, x, y + this.height - this.radius);
-			ctx.lineTo(x, y + this.radius);
-			ctx.quadraticCurveTo(x, y, x + this.radius, y);
+			ctx.moveTo(this.x + this.radius, this.y);
+			ctx.lineTo(this.x + this.width - this.radius, this.y);
+			ctx.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + this.radius);
+			ctx.lineTo(this.x + this.width, this.y + this.height - this.radius);
+			ctx.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - this.radius, this.y + this.height);
+			ctx.lineTo(this.x + this.radius, this.y + this.height);
+			ctx.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - this.radius);
+			ctx.lineTo(this.x, this.y + this.radius);
+			ctx.quadraticCurveTo(this.x, this.y, this.x + this.radius, this.y);
 			ctx.closePath();
 			if (shadows)
 				ctx.strokeStyle = this.shadowColor;
@@ -159,19 +159,19 @@
 			ctx.stroke();
 		}
 
-		this.drawWithLights = function(x, y) {
-			this.x = x;
-			this.y = y;
+		this.drawWithLights = function(startingPoint) {
+			this.x = startingPoint.x;
+			this.y = startingPoint.y;
 			var shadows = mouseInRectangle(this.width, this.height, this.x, this.y);
 			if (shadows) {
-				this.draw(x-x/500, y+y/500, true);
-				this.draw(x+x/500, y+y/500, true);
+				this.draw(new point(this.x-this.x/500, this.y+this.y/500), true);
+				this.draw(new point(this.x+this.x/500, this.y+this.y/500), true);
 			}
-			this.draw(x, y, false);
+			this.draw(startingPoint, false);
 			return shadows;
 		}
 
-		this.drawLeftArrow = function(s, shadows) {
+		this.drawArrow = function(p1, p2, p3, s, shadows) {
 			ctx.shadowBlur = 10;
 			if (shadows)
 				ctx.strokeStyle = this.shadowColor;
@@ -181,42 +181,32 @@
 
 			//freccia a sinistra
 			ctx.beginPath();
-			ctx.moveTo(this.x - this.width/33 - s, this.y + this.height/2 - this.width/33 + s);
-			ctx.lineTo(this.x - this.width/16.5 - s, this.y + this.height/2 + s);
-			ctx.lineTo(this.x - this.width/33 - s, this.y +this.height/2 + this.width/33 + s);
-			ctx.lineTo(this.x - this.width/33 - s, this.y + this.height/2 - this.width/33 + s);
-			ctx.stroke();
-		}
-
-		this.drawRightArrow = function(s, shadows) {
-			ctx.shadowBlur = 10;
-			if (shadows)
-				ctx.strokeStyle = this.shadowColor;
-			else
-				ctx.strokeStyle = this.color;
-			ctx.shadowColor = this.shadowColor;
-
-			//freccia a destra
-			ctx.beginPath();
-			ctx.moveTo(this.x + this.width + this.width/33 + s, this.y + this.height/2 - this.width/33 - s);
-			ctx.lineTo(this.x + this.width + this.width/16.5 + s, this.y + this.height/2 - s);
-			ctx.lineTo(this.x + this.width + this.width/33 + s, this.y +this.height/2 + this.width/33 - s);
-			ctx.lineTo(this.x + this.width + this.width/33 + s, this.y + this.height/2 - this.width/33 - s);
+			ctx.moveTo(p1.x - s, p1.y + s);
+			ctx.lineTo(p2.x - s, p2.y + s);
+			ctx.lineTo(p3.x - s, p3.y + s);
+			ctx.lineTo(p1.x - s, p1.y + s);
 			ctx.stroke();
 		}
 
 		this.drawArrowsWithLights = function() {
-			this.arrowOffsetX = this.width/33;
-			if (mouseInLeftArrow(this)) {
-				this.drawLeftArrows(this.height/500, true);
-				this.drawLeftArrows(-this.height/500, true);
+			this.arrowOffsetX = this.width/20;
+			var leftp1 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
+			var leftp2 = new point(this.x - this.arrowOffsetX*2, this.y + this.height/2);
+			var leftp3 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
+			var rightp1 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
+			var rightp2 = new point(this.x + this.width + this.arrowOffsetX*2, this.y + this.height/2);
+			var rightp3 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
+
+			if (mouseInTriangle(leftp1, leftp2, leftp3)) {
+				this.drawArrow(leftp1, leftp2, leftp3, this.height/1000, true);
+				this.drawArrow(leftp1, leftp2, leftp3, -this.height/1000, true);
 			}
-			if (mouseInRightArrow(this)) {
-				this.drawRightArrow(this.height/500, true);
-				this.drawRightArrow(-this.height/500, true)
+			if (mouseInTriangle(rightp1, rightp2, rightp3)) {
+				this.drawArrow(rightp1, rightp2, rightp3, this.height/1000, true);
+				this.drawArrow(rightp1, rightp2, rightp3, -this.height/1000, true)
 			}
-			this.drawLeftArrow(0, false);
-			this.drawRightArrow(0, false);
+			this.drawArrow(leftp1, leftp2, leftp3, 0, false);
+			this.drawArrow(rightp1, rightp2, rightp3, 0, false);
 		}
 	}
 
@@ -251,9 +241,9 @@
 		this.y = null;
 		this.size = size;
 
-		this.draw = function(x, y, lights, font) {
-			this.x = x;
-			this.y = y;
+		this.draw = function(startingPoint, lights, font) {
+			this.x = startingPoint.x;
+			this.y = startingPoint.y;
 			ctx.font = this.size+"px "+font;
 			ctx.shadowBlur = 10;
 			ctx.shadowColor = this.shadowColor;
@@ -262,17 +252,17 @@
 			if (lights) {
 				//this.drawLight(x-this.size/600, y-this.size/600);
 				//this.drawLight(x+this.size/1200, y+this.size/1200);
-				this.drawLight(x-this.size/1200, y+this.size/1200);
-				this.drawLight(x+this.size/1200, y-this.size/1200);
+				this.drawLight(new point(this.x-this.size/1200, this.y+this.size/1200));
+				this.drawLight(new point(this.x+this.size/1200, this.y-this.size/1200));
 			}
 			ctx.strokeStyle = this.color;
-			ctx.strokeText(this.text, x, y);
+			ctx.strokeText(this.text, this.x, this.y);
 		}
 
-		this.drawLight = function(x, y) {
+		this.drawLight = function(point) {
 			ctx.shadowColor = this.shadowColor;
 			ctx.strokeStyle = this.shadowColor;
-			ctx.strokeText(this.text, x, y);
+			ctx.strokeText(this.text, point.x, point.y);
 		}
 	}
 
@@ -287,8 +277,7 @@
 	aggiorna la posizione del muose quando si muove
 	*/
 	function updateMouseCoordinates(event) {
-		mouseX = event.clientX;
-		mouseY = event.clientY;
+		mousePoint = new point(event.clientX, event.clientY);
 	}
 
 	function mouseClick() {
@@ -308,27 +297,26 @@
 	}
 
 	function mouseInRectangle(width, height, x, y) {
-		if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
+		if (mousePoint.x >= x && mousePoint.x <= x + width && mousePoint.y >= y && mousePoint.y <= y + height) {
 			return true;
 		}
 		else
 			return false;
 	}
 
-
-	//TODO: vincoli per apparteneza a trianglo
-	function mouseInLeftArrow(rect) {
-		if (mouseX <= rect.x - rect.arrowOffsetX && )
-			return true;
-		else
-			return false;
+	function sign(point1, point2, point3) {
+		return (point1.x - point3.x)*(point2.y - point3.y)-(point2.x - point3.x)*(point1.y - point3.y);
 	}
 
-	function mouseInRightArrow(rect) {
-		if (mouseX )
-			return true;
-		else
-			return false;
+	function mouseInTriangle(point1, point2, point3) {
+		var d1 = sign(mousePoint, point1, point2);
+		var d2 = sign(mousePoint, point2, point3);
+		var d3 = sign(mousePoint, point3, point1);
+
+		var hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+		var hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+		return !(hasNeg && hasPos);
 	}
 
 </script>
