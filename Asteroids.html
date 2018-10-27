@@ -13,7 +13,6 @@
 	canvas {
 		width: 100%;
 		height: 100%;
-		margin-bottom: 0px;
 	}
 </style>
 <body>
@@ -25,26 +24,30 @@
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
+	//aggiorna la dimensioni dell'area
 	window.onresize = function resize() {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+		//applica le modifiche
 		changeGameState(gameState);
 	}
 
-	//TODO: make unique object for writings inside a rectangle
+	//TODO: make unique object for writings inside a rectangle?
 
-	var mousePoint = new point(0, 0);
-	var gameState = null;
+	var mousePoint = new point(0, 0); //conterrà la posizione del mouse
+	var gameState = null;	//stato del gioco
 	var keyPressed;
-	var title = null;
-	var titleRect = null;
-	var levelNameRect = null;
-	var levelRect = null;
-	var levelNumber = 1;
-	var currentLevel = null;
-	var firstLevel = 1;
-	var lastLevel = 10;
+	var title = null;	//titolo del gioco
+	var titleRect = null;	//rettangolo intorno titolo del gioco
+	var levelNameRect = null;	//rettangolo intorno al nome del livello
+	var levelRect = null;	//rettangolo del livello
+	var levelNumber = 1;	//numero del livello corrente
+	var currentLevel = null;	//nome del livello corrente
+	var firstLevel = 1;	//numero del primo livello
+	var lastLevel = 10; //numero dell'ultimo livello
 
+	clearArea();
+	//imposto primo stato di gioco
 	changeGameState("opening");
 
 	/*
@@ -52,8 +55,9 @@
 	*/
 	function changeGameState(newState) {
 		gameState = newState;
-		clearArea();
+		//inizializza gli oggetti
 		initializeObjects();
+		//disegna gli oggetti
 		startAnimation();
 	}
 
@@ -72,21 +76,25 @@
 	function drawArea() {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+		//pulisco l'area
 		clearArea();
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
-				var titlePoint = new point(canvas.width*7/16, canvas.height/2);
-				var rectPoint = new point(titlePoint.x-title.size/10, titlePoint.y-title.size);
+				var titlePoint = new point(canvas.width*7/16, canvas.height/2); //punto di partenza della scritta
+				var rectPoint = new point(titlePoint.x-title.size/10, titlePoint.y-title.size); //punto di partena del rettangolo
+				//ritorna true se il mouse si trova dentro il rettangolo
 				var lights = titleRect.drawWithLights(rectPoint);
 				title.draw(titlePoint, lights, "Serif");
 				break;
 
 			case "levels":
+				//aggiorno il nome del livello
 				currentLevel = "Level "+levelNumber;
 				levelName.setText(currentLevel);
-				var levelNamePoint = new point(canvas.width*15/34, canvas.height*4/5);
+				var levelNamePoint = new point(canvas.width*15/34, canvas.height*4/5); //punto di partenza del nome del livello
 				levelNameRect.setWidth(ctx.measureText(levelName.text).width*levelName.size/10);
+				//ritorna true se il mouse si trova dentro il rettangolo
 				var lights = levelNameRect.drawWithLights(new point(levelNamePoint.x-levelName.size/10, levelNamePoint.y-levelName.size));
 				levelName.draw(levelNamePoint, lights, "Serif");
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
@@ -107,6 +115,7 @@
 				titleRect = new roundRectangle(ctx.measureText(title.text).width*title.size/10.8, title.size*1.5, new Color(0, 255, 0));
 				break;
 			case "levels":
+				//aggiorno il nome del livello
 				currentLevel = "Level "+levelNumber;
 				levelName = new neonString(new Color(255, 255, 255), new Color(255, 255, 0), canvas.height/20);
 				levelName.setText(currentLevel);
@@ -118,7 +127,7 @@
 	}
 
 	/*
-	imposta i listener per mouse e tastiera
+	avvia le animazioni
 	*/
 	function startAnimation() {
 		switch (gameState) {
@@ -132,33 +141,47 @@
 		}
 	}
 
+	/*
+	Un punto con coordinate x y
+	*/
 	function point(x, y) {
 		this.x = x;
 		this.y = y;
 	}
 
+	/*
+	Oggeto che rappresenta un rettangolo con gli angoli arrotondati
+	*/
 	function roundRectangle(width, height, shadowColor) {
 		this.width = width;
 		this.height = height;
 		this.shadowColor = shadowColor.makeColor(1);
 		this.color = new Color(255, 255, 255).makeColor(1);
-		this.radius = 10;
-		this.x = null;
-		this.y = null;
-		this.arrowOffsetX = null;
+		this.radius = 10; //raggio degli angoli rotondi
+		this.x = null; //x dell'angolo in altro a sx
+		this.y = null; //y dell'angolo in altro a sx
+		this.arrowOffsetX = null; //distanza delle frecce laterali dal rettangolo
+		//vertici delle frecce
 		this.leftp1 = null;
 		this.leftp2 = null;
 		this.leftp3 = null;
 		this.rightp1 = null;
 		this.rightp2 = null;
 		this.rightp3 = null;
-		this.leftArrow = false;
-		this.rightArrow = true;
+		//per mostrare le frecce
+		this.showLeftArrow = false;
+		this.showRightArrow = true;
 
+		//imposta la largheza del rettangolo
 		this.setWidth = function(width) {
 			this.width = width;
 		}
 
+		/*
+		disegna il rettangolo
+		@param point: punto di parenza del rettangolo (in altro a sx)
+		@param shadows: true per disegnare solo l'ombra
+		*/
 		this.draw = function(point, shadows) {
 			ctx.shadowBlur = 10;
 			ctx.shadowColor = this.shadowColor;
@@ -180,10 +203,16 @@
 			ctx.stroke();
 		}
 
+		/*
+		Disegna il rettangolo (con le ombre se contiene il mouse)
+		@param startingPoint: punto di parenza del rettangolo (in altro a sx)
+		@return true se il mouse si trova all'interno, false altrimenti
+		*/
 		this.drawWithLights = function(startingPoint) {
 			this.x = startingPoint.x;
 			this.y = startingPoint.y;
 			var shadows = mouseInRectangle(this.width, this.height, this.x, this.y);
+			//se il mouse si trova all'interno del rettangolo disegno le ombre
 			if (shadows) {
 				this.draw(new point(this.x-this.x/500, this.y+this.y/500), true);
 				this.draw(new point(this.x+this.x/500, this.y+this.y/500), true);
@@ -192,6 +221,12 @@
 			return shadows;
 		}
 
+		/*
+		Disegna una freccia (trinagolo)
+		@param p1, p2, p3: vertici del triangolo
+		@param s: offset per disegnare le ombre
+		@shadows: true per disegnare l'ombra, false per disegnare il triangolo
+		*/
 		this.drawArrow = function(p1, p2, p3, s, shadows) {
 			ctx.shadowBlur = 10;
 			if (shadows)
@@ -200,7 +235,6 @@
 				ctx.strokeStyle = this.color;
 			ctx.shadowColor = this.shadowColor;
 
-			//freccia a sinistra
 			ctx.beginPath();
 			ctx.moveTo(p1.x - s, p1.y + s);
 			ctx.lineTo(p2.x - s, p2.y + s);
@@ -209,8 +243,12 @@
 			ctx.stroke();
 		}
 
+		/*
+		Disegna le frecce con le ombre
+		*/
 		this.drawArrowsWithLights = function() {
-			this.arrowOffsetX = this.width/20;
+			this.arrowOffsetX = this.width/20; 	//distanza delle frecce dai lati del rettangolo e grandezza delle frecce
+			//definisco vertici dei trinagoli
 			this.leftp1 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
 			this.leftp2 = new point(this.x - this.arrowOffsetX*2, this.y + this.height/2);
 			this.leftp3 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
@@ -218,18 +256,24 @@
 			this.rightp2 = new point(this.x + this.width + this.arrowOffsetX*2, this.y + this.height/2);
 			this.rightp3 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
 
-			if (mouseInTriangle(this.leftp1, this.leftp2, this.leftp3) && this.leftArrow) {
+			//disegno le ombre della freccia di sinistra
+			if (mouseInTriangle(this.leftp1, this.leftp2, this.leftp3) && this.showLeftArrow) {
 				this.drawArrow(this.leftp1, this.leftp2, this.leftp3, this.height/1000, true);
 				this.drawArrow(this.leftp1, this.leftp2, this.leftp3, -this.height/1000, true);
 			}
-			if (mouseInTriangle(this.rightp1, this.rightp2, this.rightp3) && this.rightArrow) {
+
+			//disegno le ombre della freccia di destra
+			if (mouseInTriangle(this.rightp1, this.rightp2, this.rightp3) && this.showRightArrow) {
 				this.drawArrow(this.rightp1, this.rightp2, this.rightp3, this.height/1000, true);
 				this.drawArrow(this.rightp1, this.rightp2, this.rightp3, -this.height/1000, true)
 			}
 
-			if (this.leftArrow)
+			//disegno la freccia di sinistra
+			if (this.showLeftArrow)
 				this.drawArrow(this.leftp1, this.leftp2, this.leftp3, 0, false);
-			if (this.rightArrow)
+
+			//disegno la freccia di destra
+			if (this.showRightArrow)
 				this.drawArrow(this.rightp1, this.rightp2, this.rightp3, 0, false);
 		}
 	}
@@ -256,6 +300,9 @@
 
 	/*
 	stringa con effetto neon
+	@param color: colore della scritta
+	@param shadowColor: colore dell'ombra
+	@param size: dimensione del font
 	*/
 	function neonString(color, shadowColor, size) {
 		this.color = color.makeColor(1);
@@ -265,7 +312,13 @@
 		this.y = null;
 		this.size = size;
 
-		this.draw = function(startingPoint, lights, font) {
+		/*
+		Disegna la scritta
+		@param startingPoint: punto di partenza della scritta (in alto a sx)
+		@param shadow: true per disegnare anche l'ombra, false altrimenti
+		@param font: font
+		*/
+		this.draw = function(startingPoint, shadow, font) {
 			this.x = startingPoint.x;
 			this.y = startingPoint.y;
 			ctx.font = this.size+"px "+font;
@@ -273,22 +326,24 @@
 			ctx.shadowColor = this.shadowColor;
 			ctx.shadowOffsetX = this.size/100;
 			ctx.shadowOffsetY = this.size/100;
-			if (lights) {
+			if (shadow) {
 				//this.drawLight(x-this.size/600, y-this.size/600);
 				//this.drawLight(x+this.size/1200, y+this.size/1200);
-				this.drawLight(new point(this.x-this.size/1200, this.y+this.size/1200));
-				this.drawLight(new point(this.x+this.size/1200, this.y-this.size/1200));
+				this.drawShadow(new point(this.x-this.size/1200, this.y+this.size/1200));
+				this.drawShadow(new point(this.x+this.size/1200, this.y-this.size/1200));
 			}
 			ctx.strokeStyle = this.color;
 			ctx.strokeText(this.text, this.x, this.y);
 		}
 
-		this.drawLight = function(point) {
+		//disegna l'ombra
+		this.drawShadow = function(point) {
 			ctx.shadowColor = this.shadowColor;
 			ctx.strokeStyle = this.shadowColor;
 			ctx.strokeText(this.text, point.x, point.y);
 		}
 
+		//imposta il testo da scrivere
 		this.setText = function(text) {
 			this.text = text;
 		}
@@ -308,6 +363,9 @@
 		mousePoint = new point(event.clientX, event.clientY);
 	}
 
+	/*
+	Gestisce l'evento mouseClick
+	*/
 	function mouseClick() {
 		switch(gameState) {
 			case "opening":
@@ -317,7 +375,7 @@
 				}
 			break;
 			case "levels":
-				//click sulla freccia di sinistra
+				//click sulla freccia di sinistra, passa al livello precedente
 				if (mouseInTriangle(levelRect.leftp1, levelRect.leftp2, levelRect.leftp3)) {
 					if (levelNumber > firstLevel) {
 						levelNumber--;
@@ -325,7 +383,7 @@
 						drawArea();
 					}
 				}
-				//click sulla freccia di destra
+				//click sulla freccia di destra, passa al prossimo livello
 				else if (mouseInTriangle(levelRect.rightp1, levelRect.rightp2, levelRect.rightp3)) {
 					if (levelNumber < lastLevel) {
 						levelNumber++;
@@ -339,22 +397,31 @@
 		}
 	}
 
+	/*
+	Imposta le frecce da mostrare
+	*/
 	function updateArrows() {
 		switch(levelNumber) {
-			case 1:
-				levelRect.leftArrow = false;
-				levelRect.rightArrow = true;
+			//primo livello, solo freccia a dx
+			case firstLevel:
+				levelRect.showLeftArrow = false;
+				levelRect.showRightArrow = true;
 				break;
-			case 10:
-				levelRect.leftArrow = true;
-				levelRect.rightArrow = false;
+			//ultimo livello, solo freccia a sx
+			case lastLevel:
+				levelRect.showLeftArrow = true;
+				levelRect.showRightArrow = false;
 				break;
 			default:
-				levelRect.leftArrow = true;
-				levelRect.rightArrow = true;
+				levelRect.showLeftArrow = true;
+				levelRect.showRightArrow = true;
 		}
 	}
 
+	/*
+	Controlla se il mouse si trova nel rettangolo
+	@return: true se il mouse si trova all'interno, false altrimenti
+	*/
 	function mouseInRectangle(width, height, x, y) {
 		if (mousePoint.x >= x && mousePoint.x <= x + width && mousePoint.y >= y && mousePoint.y <= y + height) {
 			return true;
@@ -363,10 +430,17 @@
 			return false;
 	}
 
+	/*
+
+	*/
 	function sign(point1, point2, point3) {
 		return (point1.x - point3.x)*(point2.y - point3.y)-(point2.x - point3.x)*(point1.y - point3.y);
 	}
 
+	/*
+	Controlla se il mouse si trova all'interno del triangolo
+	@return: true se il mouse si trova all'interno, false altrimenti
+	*/
 	function mouseInTriangle(point1, point2, point3) {
 		var d1 = sign(mousePoint, point1, point2);
 		var d2 = sign(mousePoint, point2, point3);
