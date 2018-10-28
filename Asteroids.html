@@ -42,6 +42,7 @@
 	var currentLevel = null;	//nome del livello corrente
 	var firstLevel = 1;	//numero del primo livello
 	var lastLevel = 10; //numero dell'ultimo livello
+	var polygon1 = null;
 
 	clearArea();
 	//imposto primo stato di gioco
@@ -79,6 +80,7 @@
 			case "opening":
 				title.setText("Start game");
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
+				polygon1.draw(new point(canvas.width/2, canvas.height/2));
 				break;
 
 			case "levels":
@@ -101,15 +103,16 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-				title = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(0, 255, 0), "Start game");
+				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
+				polygon1 = new polygon(5, 20, new color(255, 255, 255), new color(255, 0, 0), 5);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
 				levelNumber = 1;
 				currentLevel = "Level "+levelNumber;
-				levelName = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(255, 255, 0), currentLevel);
-				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new Color(255, 255, 0));
-				backButton = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(0, 255, 255), "Back");
+				levelName = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(255, 255, 0), currentLevel);
+				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 255, 0));
+				backButton = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), "Back");
 				break;
 			case "playing": break;
 		}
@@ -145,7 +148,7 @@
 		this.width = width;
 		this.height = height;
 		this.shadowColor = shadowColor.makeColor(1);
-		this.color = new Color(255, 255, 255).makeColor(1);
+		this.color = new color(255, 255, 255).makeColor(1);
 		this.radius = 10; //raggio degli angoli rotondi
 		this.x = null; //x dell'angolo in altro a sx
 		this.y = null; //y dell'angolo in altro a sx
@@ -341,10 +344,33 @@
 		}
 	}
 
+	function polygon(sides, size, color, shadowColor, rv) {
+		this.sides = sides;
+		this.side = size;
+		this.color = color.makeColor(1);
+		this.shadowColor = shadowColor.makeColor(1);
+		this.rotation = 0;
+		this.rv = rv;
+
+		this.draw = function(center) {
+			ctx.strokeStyle = this.color;
+			ctx.shadowColor = this.shadowColor;
+			this.shadowBlur = 10;
+			ctx.beginPath();
+			ctx.moveTo(center.x + size * Math.cos(0 + this.rotation), center.y + size * Math.sin(0 + this.rotation));
+			for (var i=0; i<sides; i++) {
+				ctx.lineTo(center.x + size * Math.cos(i * 2 * Math.PI / sides) + this.rotation, center.y + size * Math.sin(i * 2 * Math.PI / sides) + this.rotation);
+			}
+			ctx.closePath();
+			ctx.stroke();
+			this.rotation = (this.rotation + this.rv) % (Math.Pi * 2);
+		}
+	}
+
 	/*
 	oggetto per generare colori
 	*/
-	function Color(red, green, blue) {
+	function color(red, green, blue) {
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
