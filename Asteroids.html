@@ -32,13 +32,10 @@
 		changeGameState(gameState);
 	}
 
-	//TODO: make unique object for writings inside a rectangle?
-
 	var mousePoint = new point(0, 0); //conterrà la posizione del mouse
 	var gameState = null;	//stato del gioco
 	var keyPressed;
 	var title = null;	//titolo del gioco
-	var levelNameRect = null;	//rettangolo intorno al nome del livello
 	var levelRect = null;	//rettangolo del livello
 	var backButton = null;
 	var levelNumber = 1;	//numero del livello corrente
@@ -108,6 +105,7 @@
 				break;
 			case "levels":
 				//aggiorno il nome del livello
+				levelNumber = 1;
 				currentLevel = "Level "+levelNumber;
 				levelName = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(255, 255, 0), currentLevel);
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new Color(255, 255, 0));
@@ -469,16 +467,6 @@
 
 		return !(hasNeg && hasPos);
 	}
-/*
-	function measureString(string) {
-		var width = 0;
-		var letters = string.split("");
-		for (var i=0; i<letters.length; i++) {
-			width += ctx.measureText(letters[i]).width;
-		}
-		return width;
-	}
-*/
 </script>
 </body>
 </html>
