@@ -38,9 +38,9 @@
 	var gameState = null;	//stato del gioco
 	var keyPressed;
 	var title = null;	//titolo del gioco
-	var titleRect = null;	//rettangolo intorno titolo del gioco
 	var levelNameRect = null;	//rettangolo intorno al nome del livello
 	var levelRect = null;	//rettangolo del livello
+	var backButton = null;
 	var levelNumber = 1;	//numero del livello corrente
 	var currentLevel = null;	//nome del livello corrente
 	var firstLevel = 1;	//numero del primo livello
@@ -81,24 +81,18 @@
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
-				var titlePoint = new point(canvas.width*7/16, canvas.height/2); //punto di partenza della scritta
-				var rectPoint = new point(titlePoint.x-title.size/10, titlePoint.y-title.size); //punto di partena del rettangolo
-				//ritorna true se il mouse si trova dentro il rettangolo
-				var lights = titleRect.drawWithLights(rectPoint);
-				title.draw(titlePoint, lights, "Serif");
+				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 				break;
 
 			case "levels":
 				//aggiorno il nome del livello
 				currentLevel = "Level "+levelNumber;
 				levelName.setText(currentLevel);
-				var levelNamePoint = new point(canvas.width*15/34, canvas.height*4/5); //punto di partenza del nome del livello
-				levelNameRect.setWidth(ctx.measureText(levelName.text).width*levelName.size/10);
-				//ritorna true se il mouse si trova dentro il rettangolo
-				var lights = levelNameRect.drawWithLights(new point(levelNamePoint.x-levelName.size/10, levelNamePoint.y-levelName.size));
-				levelName.draw(levelNamePoint, lights, "Serif");
+				backButton.setText("Back");
+				levelName.draw(new point(canvas.width*15/34, canvas.height*4/5), "Serif");
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
 				levelRect.drawArrowsWithLights();
+				backButton.draw(new point(canvas.width/20, canvas.height/15), "Serif", false);
 				break;
 			case "playing": break;
 		}
@@ -110,17 +104,14 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-				title = new neonString(new Color(255, 255, 255), new Color(0, 255, 0), canvas.height/20);
-				title.setText("Start game");
-				titleRect = new roundRectangle(ctx.measureText(title.text).width*title.size/10.8, title.size*1.5, new Color(0, 255, 0));
+				title = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(0, 255, 0), "Start game");
 				break;
 			case "levels":
 				//aggiorno il nome del livello
 				currentLevel = "Level "+levelNumber;
-				levelName = new neonString(new Color(255, 255, 255), new Color(255, 255, 0), canvas.height/20);
-				levelName.setText(currentLevel);
-				levelNameRect = new roundRectangle(ctx.measureText(levelName.text).width*levelName.size/10, levelName.size*1.5, new Color(255, 255, 0));
+				levelName = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(255, 255, 0), currentLevel);
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new Color(255, 255, 0));
+				backButton = new writingsRectangle(canvas.height/20, new Color(255, 255, 255), new Color(0, 255, 255), "Back");
 				break;
 			case "playing": break;
 		}
@@ -279,6 +270,80 @@
 	}
 
 	/*
+	Oggetto che rappresenta un scritta circondata da un rettangolo
+	*/
+	function writingsRectangle(size, color, shadowColor, text) {
+		this.size = size;
+		this.color = color.makeColor(1);
+		this.shadowColor = shadowColor.makeColor(1);
+		this.text = text;
+		this.radius = 10;
+		this.wpoint = null;
+		this.rpoint = null;
+		this.rectWidth = ctx.measureText(text).width*5.3;
+		this.rectHeight = this.size*1.5;
+
+		//disegna il rettangolo con la scritta dentro
+		this.draw = function(startingPoint, font) {
+			this.wpoint = startingPoint;
+			this.rpoint = new point(startingPoint.x - this.rectWidth*3/25 , startingPoint.y - this.size);
+
+			ctx.font = this.size+"px "+font;
+			ctx.shadowBlur = 10;
+			ctx.shadowColor = this.shadowColor;
+			ctx.shadowOffsetX = this.size/100;
+			ctx.shadowOffsetY = this.size/100;
+			if (mouseInRectangle(this.rectWidth, this.rectHeight, this.rpoint.x, this.rpoint.y)) {
+				//this.drawLight(x-this.size/600, y-this.size/600);
+				//this.drawLight(x+this.size/1200, y+this.size/1200);
+				this.drawShadow(new point(this.wpoint.x-this.size/1200, this.wpoint.y+this.size/1200));
+				this.drawShadow(new point(this.wpoint.x+this.size/1200, this.wpoint.y-this.size/1200));
+				this.drawRect(true);
+				this.drawRect(true);
+			}
+			ctx.strokeStyle = this.color;
+			ctx.strokeText(this.text, this.wpoint.x, this.wpoint.y);
+			this.drawRect(false);
+
+		}
+
+		//disegna l'ombra
+		this.drawShadow = function(point) {
+			ctx.shadowColor = this.shadowColor;
+			ctx.strokeStyle = this.shadowColor;
+			ctx.strokeText(this.text, point.x, point.y);
+		}
+
+		//disegna il rettangolo
+		this.drawRect = function(shadows) {
+			ctx.shadowBlur = 10;
+			ctx.shadowColor = this.shadowColor;
+			ctx.beginPath();
+			ctx.moveTo(this.rpoint.x + this.radius, this.rpoint.y);
+			ctx.lineTo(this.rpoint.x + this.rectWidth - this.radius, this.rpoint.y);
+			ctx.quadraticCurveTo(this.rpoint.x + this.rectWidth, this.rpoint.y, this.rpoint.x + this.rectWidth, this.rpoint.y + this.radius);
+			ctx.lineTo(this.rpoint.x + this.rectWidth, this.rpoint.y + this.rectHeight - this.radius);
+			ctx.quadraticCurveTo(this.rpoint.x + this.rectWidth, this.rpoint.y + this.rectHeight, this.rpoint.x + this.rectWidth - this.radius, this.rpoint.y + this.rectHeight);
+			ctx.lineTo(this.rpoint.x + this.radius, this.rpoint.y + this.rectHeight);
+			ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y + this.rectHeight, this.rpoint.x, this.rpoint.y + this.rectHeight - this.radius);
+			ctx.lineTo(this.rpoint.x, this.rpoint.y + this.radius);
+			ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y, this.rpoint.x + this.radius, this.rpoint.y);
+			ctx.closePath();
+			if (shadows)
+				ctx.strokeStyle = this.shadowColor;
+			else
+				ctx.strokeStyle = this.color;
+			ctx.stroke();
+		}
+
+		//imposta il testo e ricalcola la larghezza del rettangolo
+		this.setText = function(text) {
+			this.text = text;
+			this.rectWidth = ctx.measureText(text).width*this.size*3/25;
+		}
+	}
+
+	/*
 	oggetto per generare colori
 	*/
 	function Color(red, green, blue) {
@@ -295,57 +360,6 @@
 
 		this.makeHexColor = function() {
 			return "#"+this.hex;
-		}
-	}
-
-	/*
-	stringa con effetto neon
-	@param color: colore della scritta
-	@param shadowColor: colore dell'ombra
-	@param size: dimensione del font
-	*/
-	function neonString(color, shadowColor, size) {
-		this.color = color.makeColor(1);
-		this.shadowColor = shadowColor.makeColor(1);
-		this.text = null;
-		this.x = null;
-		this.y = null;
-		this.size = size;
-
-		/*
-		Disegna la scritta
-		@param startingPoint: punto di partenza della scritta (in alto a sx)
-		@param shadow: true per disegnare anche l'ombra, false altrimenti
-		@param font: font
-		*/
-		this.draw = function(startingPoint, shadow, font) {
-			this.x = startingPoint.x;
-			this.y = startingPoint.y;
-			ctx.font = this.size+"px "+font;
-			ctx.shadowBlur = 10;
-			ctx.shadowColor = this.shadowColor;
-			ctx.shadowOffsetX = this.size/100;
-			ctx.shadowOffsetY = this.size/100;
-			if (shadow) {
-				//this.drawLight(x-this.size/600, y-this.size/600);
-				//this.drawLight(x+this.size/1200, y+this.size/1200);
-				this.drawShadow(new point(this.x-this.size/1200, this.y+this.size/1200));
-				this.drawShadow(new point(this.x+this.size/1200, this.y-this.size/1200));
-			}
-			ctx.strokeStyle = this.color;
-			ctx.strokeText(this.text, this.x, this.y);
-		}
-
-		//disegna l'ombra
-		this.drawShadow = function(point) {
-			ctx.shadowColor = this.shadowColor;
-			ctx.strokeStyle = this.shadowColor;
-			ctx.strokeText(this.text, point.x, point.y);
-		}
-
-		//imposta il testo da scrivere
-		this.setText = function(text) {
-			this.text = text;
 		}
 	}
 
@@ -370,7 +384,7 @@
 		switch(gameState) {
 			case "opening":
 				//con il click su "Start game" passo ai livelli
-				if (mouseInRectangle(titleRect.width, titleRect.height, titleRect.x, titleRect.y)) {
+				if (mouseInRectangle(title.rectWidth, title.rectHeight, title.rpoint.x, title.rpoint.y)) {
 					changeGameState("levels");
 				}
 			break;
@@ -390,6 +404,10 @@
 						updateArrows();
 						drawArea();
 					}
+				}
+				//click sul bottone back
+				else if (mouseInRectangle(backButton.rectWidth, backButton.rectHeight, backButton.rpoint.x, backButton.rpoint.y)) {
+					changeGameState("opening");
 				}
 				break;
 			case "playing":
@@ -431,7 +449,7 @@
 	}
 
 	/*
-
+	TODO: why?
 	*/
 	function sign(point1, point2, point3) {
 		return (point1.x - point3.x)*(point2.y - point3.y)-(point2.x - point3.x)*(point1.y - point3.y);
@@ -451,7 +469,16 @@
 
 		return !(hasNeg && hasPos);
 	}
-
+/*
+	function measureString(string) {
+		var width = 0;
+		var letters = string.split("");
+		for (var i=0; i<letters.length; i++) {
+			width += ctx.measureText(letters[i]).width;
+		}
+		return width;
+	}
+*/
 </script>
 </body>
 </html>
