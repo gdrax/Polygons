@@ -291,9 +291,9 @@
 		this.draw = function(startingPoint, font) {
 			this.wpoint = startingPoint;
 			this.rpoint = new point(startingPoint.x - this.rectWidth*3/25 , startingPoint.y - this.size);
-			ctx.clearRect(this.rpoint.x, this.rpoint.y, this.rectWidth, this.rectHeight);
-			ctx.fillStyle = backgroundColor.makeColor(1);
-			ctx.fillRect(this.rpoint.x, this.rpoint.y, this.rectWidth, this.rectHeight);
+			//ctx.clearRect(this.rpoint.x, this.rpoint.y, this.rectWidth, this.rectHeight);
+			//ctx.fillStyle = backgroundColor.makeColor(1);
+			//ctx.fillRect(this.rpoint.x, this.rpoint.y, this.rectWidth, this.rectHeight);
 			ctx.font = this.size+"px "+font;
 			ctx.shadowBlur = 10;
 			ctx.shadowColor = this.shadowColor;
@@ -349,6 +349,9 @@
 		}
 	}
 
+	/*
+	Oggetto che rappresenta un poligono in movimeto
+	*/
 	function polygon(sides, size, color, shadowColor, rv, v, angle) {
 		this.sides = sides;
 		this.size = size;
@@ -360,8 +363,11 @@
 		this.v = v;
 		this.angle = angle;
 
-		this.draw = function(center) {
-			ctx.strokeStyle = this.color;
+		this.draw = function(center, shadows) {
+			if (shadows)
+				ctx.strokeStyle = this.shadowColor;
+			else
+				ctx.strokeStyle = this.color;
 			ctx.shadowColor = this.shadowColor;
 			this.shadowBlur = 10;
 			ctx.beginPath();
@@ -375,6 +381,16 @@
 			ctx.stroke();
 			this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
 			this.translation += this.v;
+		}
+
+		this.drawWithLights = function(center) {
+			var s = this.size;
+			this.size = s * 1001/1000;
+			this.draw(center, true);
+			this.size = s * 999/1000;
+			this.draw(center, true)
+			this.size = s;
+			this.draw(center, false);
 		}
 	}
 
