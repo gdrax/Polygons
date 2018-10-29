@@ -104,7 +104,7 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
-				polygon1 = new polygon(5, 20, new color(255, 255, 255), new color(255, 0, 0), 5);
+				polygon1 = new polygon(5, 20, new color(255, 255, 255), new color(255, 0, 0), 0.04);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
@@ -359,11 +359,11 @@
 			ctx.beginPath();
 			ctx.moveTo(center.x + size * Math.cos(0 + this.rotation), center.y + size * Math.sin(0 + this.rotation));
 			for (var i=0; i<sides; i++) {
-				ctx.lineTo(center.x + size * Math.cos(i * 2 * Math.PI / sides) + this.rotation, center.y + size * Math.sin(i * 2 * Math.PI / sides) + this.rotation);
+				ctx.lineTo(center.x + size * Math.cos(i * 2 * Math.PI / sides + this.rotation), center.y + size * Math.sin(i * 2 * Math.PI / sides + this.rotation));
 			}
 			ctx.closePath();
 			ctx.stroke();
-			this.rotation = (this.rotation + this.rv) % (Math.Pi * 2);
+			this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
 		}
 	}
 
