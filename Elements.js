@@ -31,6 +31,12 @@ function roundRectangle(width, height, shadowColor) {
   @param shadows: true per disegnare solo l'ombra
   */
   this.draw = function(point, shadows) {
+    ctx.clearRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
+    ctx.fillStyle = backgroundColor.makeColor(1);
+    ctx.shadowColor = backgroundColor.makeColor(1);
+    ctx.strokeStyle = backgroundColor.makeColor(1);
+    ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
+    ctx.fillStyle = this.color;
     ctx.shadowBlur = 10;
     ctx.shadowColor = this.shadowColor;
     ctx.beginPath();
@@ -237,6 +243,7 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 			ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
 		}
 		ctx.closePath();
+    ctx.fill();
 		ctx.stroke();
 		this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
 		this.translationX += this.vx;

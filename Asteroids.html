@@ -37,6 +37,8 @@
 	var firstLevel = 1;	//numero del primo livello
 	var lastLevel = 10; //numero dell'ultimo livello
 	var polygons = [];
+	var maxOpeningPolygons = 15;
+	var maxLevelsPolygons = 15;
 	var animation = null;
 	var backgroundColor = new color(10, 10, 10);
 
@@ -83,7 +85,8 @@
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
-				polygons[0].drawWithLights(new point(canvas.width/2, canvas.height/4+60));
+				for (var i=0; i<maxOpeningPolygons; i++)
+					polygons[i].drawWithLights(new point(canvas.width/10+i*10, canvas.width/10+i*20));
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 				bouncePolygons();
 				break;
@@ -93,10 +96,13 @@
 				currentLevel = "Level "+levelNumber;
 				levelName.setText(currentLevel);
 				backButton.setText("Back");
+				for (var i=0; i<maxLevelsPolygons; i++)
+					polygons[i].drawWithLights(new point(canvas.width/10+i*10, canvas.width/10+i*20));
 				levelName.draw(new point(canvas.width*15/34, canvas.height*4/5), "Serif");
 				backButton.draw(new point(canvas.width/20, canvas.height/15), "Serif");
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
 				levelRect.drawArrowsWithLights();
+				bouncePolygons();
 				break;
 			case "playing":
 				for (var i=0; i<10; i++) {
@@ -114,12 +120,17 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
-				polygons[0] = new polygon(6, 50, new color(255, 255, 255), new color(200, 0, 255), 0, 0.5, 0.5, 0.5);
+				for (var i=0; i<maxOpeningPolygons; i++)
+					polygons[i] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
+																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*1.5, Math.random()*1.5, Math.random());
 				break;
 			case "levels":
 				//aggiorno il nome del livello
 				levelNumber = 1;
 				currentLevel = "Level "+levelNumber;
+				for (var i=0; i<maxLevelsPolygons; i++)
+					polygons[i] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
+																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*1.5, Math.random()*1.5, Math.random());
 				levelName = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), currentLevel);
 				backButton = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), "Back");
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 0, 255));
