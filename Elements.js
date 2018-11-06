@@ -206,15 +206,17 @@ function writingsRectangle(size, color, shadowColor, text) {
 /*
 Oggetto che rappresenta un poligono in movimeto
 */
-function polygon(sides, size, color, shadowColor, rv, v, angle) {
+function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 	this.sides = sides;
 	this.size = size;
 	this.color = color.makeColor(1);
 	this.shadowColor = shadowColor.makeColor(1);
 	this.rotation = 0;
 	this.rv = rv;
-	this.translation = 0;
-	this.v = v;
+	this.translationX = 0;
+  this.translationY = 0;
+	this.vx = vx;
+  this.vy = vy;
 	this.angle = angle;
   this.vertices = [];
 
@@ -226,18 +228,19 @@ function polygon(sides, size, color, shadowColor, rv, v, angle) {
 		ctx.shadowColor = this.shadowColor;
 		this.shadowBlur = 10;
 		ctx.beginPath();
-    this.vertices[0] = new point(center.x + this.size * Math.cos(0 + this.rotation) + this.translation * Math.cos(this.angle),
-							                   center.y + this.size * Math.sin(0 + this.rotation) + this.translation * Math.sin(this.angle))
+    this.vertices[0] = new point(center.x + this.size * Math.cos(0 + this.rotation) + this.translationX * Math.cos(this.angle),
+							                   center.y + this.size * Math.sin(0 + this.rotation) + this.translationY * Math.sin(this.angle))
 		ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
 		for (var i=1; i<this.sides; i++) {
-      this.vertices[i] = new point(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translation * Math.cos(this.angle),
-								            center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translation * Math.sin(this.angle));
+      this.vertices[i] = new point(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translationX * Math.cos(this.angle),
+								                   center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translationY * Math.sin(this.angle));
 			ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
 		}
 		ctx.closePath();
 		ctx.stroke();
 		this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
-		this.translation += this.v;
+		this.translationX += this.vx;
+    this.translationY += this.vy;
 	}
 
 	this.drawWithLights = function(center) {
@@ -257,6 +260,10 @@ Un punto con coordinate x y
 function point(x, y) {
   this.x = x;
   this.y = y;
+
+  this.subtract = function(v) {
+    return new vector(v.x - this.x, v.y - this.y);
+  }
 }
 
 /*

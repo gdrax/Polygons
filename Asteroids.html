@@ -36,7 +36,7 @@
 	var currentLevel = null;	//nome del livello corrente
 	var firstLevel = 1;	//numero del primo livello
 	var lastLevel = 10; //numero dell'ultimo livello
-	var polygon1 = null;
+	var polygons = [];
 	var animation = null;
 	var backgroundColor = new color(10, 10, 10);
 
@@ -83,7 +83,9 @@
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
+				polygons[0].drawWithLights(new point(canvas.width/2, canvas.height/4+60));
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
+				bouncePolygons();
 				break;
 
 			case "levels":
@@ -97,7 +99,10 @@
 				levelRect.drawArrowsWithLights();
 				break;
 			case "playing":
-				polygon1.drawWithLights(new point(canvas.width/2, canvas.height/4));
+				for (var i=0; i<10; i++) {
+					polygons[i].drawWithLights(new point(canvas.width/2+10*i, canvas.height/4-10*i));
+				}
+				bouncePolygons();
 				break;
 		}
 	}
@@ -109,6 +114,7 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
+				polygons[0] = new polygon(6, 50, new color(255, 255, 255), new color(200, 0, 255), 0, 0.5, 0.5, 0.5);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
@@ -119,7 +125,9 @@
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 0, 255));
 				break;
 			case "playing":
-				polygon1 = new polygon(5, 50, new color(255, 255, 255), new color(255, 0, 0), 0.02, 0.5, 0.5);
+				for (var i=0; i<10; i++) {
+					polygons[i] = new polygon(6, i*5, new color(255, 255, 255), new color(200-20*i, 0+10*i, 255), 0, 0.05*i+0.05, 0.05*i+0.05, 0.05*i+0.05);
+				}
 				break;
 		}
 	}
@@ -249,6 +257,23 @@
 		var hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
 
 		return !(hasNeg && hasPos);
+	}
+
+	function bouncePolygons() {
+		for (var i=0; i<polygons.length; i++) {
+			for (var j=0; j<polygons[i].vertices.length; j++) {
+				var x = polygons[i].vertices[j].x;
+				var y = polygons[i].vertices[j].y;
+				if (x + polygons[i].vx >= canvas.width || x - polygons[i].vx <= 0) {
+					polygons[i].vx = -polygons[i].vx;
+					break;
+				}
+				if (y + polygons[i].vy >= canvas.height || y - polygons[i].vy <= 0) {
+					polygons[i].vy = -polygons[i].vy;
+					break;
+				}
+			}
+		}
 	}
 </script>
 </body>

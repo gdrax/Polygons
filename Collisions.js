@@ -26,10 +26,10 @@ function detectCollision(s1, s2) {
 
 //restituisce gli assi di una figura
 function getAxes(shape) {
-  var axes;
-  for (var i=0; i<shape.vetices.length; i++) {
+  var axes = [];
+  for (var i=0; i<shape.vertices.length; i++) {
     var p1 = shape.vertices[i];
-    var p2 = shape.vertices[i + 1 == shape.vertices.legth ? 0 : i + 1];
+    var p2 = shape.vertices[(i+1)%shape.vertices.length];
     var edge = p1.subtract(p2);
     //perpendicolare al lato
     var normal = edge.perp();
@@ -69,10 +69,6 @@ function projection(min, max) {
 function vector(a, b) {
   this.a = a;
   this.b = b;
-
-  this.subtract = function(v) {
-    return new vector(v.a - this.a, v.b - this.b);
-  }
 
   //restituisce il vettore perpendicolare
   this.perp = function() {
