@@ -108,7 +108,7 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
-				polygon1 = new polygon(5, 20, new color(255, 255, 255), new color(255, 0, 0), 0.02, 0.5, 0.5);
+				polygon1 = new polygon(5, 50, new color(255, 255, 255), new color(255, 0, 0), 0.02, 0.5, 0.5);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
@@ -136,14 +136,6 @@
 				break;
 			case "playing": break;
 		}
-	}
-
-	/*
-	Un punto con coordinate x y
-	*/
-	function point(x, y) {
-		this.x = x;
-		this.y = y;
 	}
 
 	/*

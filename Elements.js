@@ -218,6 +218,7 @@ function polygon(sides, size, color, shadowColor, rv, v, angle) {
 	this.translation = 0;
 	this.v = v;
 	this.angle = angle;
+  this.vertices = [];
 
 	this.draw = function(center, shadows) {
 	  if (shadows)
@@ -227,11 +228,13 @@ function polygon(sides, size, color, shadowColor, rv, v, angle) {
 		ctx.shadowColor = this.shadowColor;
 		this.shadowBlur = 10;
 		ctx.beginPath();
-		ctx.moveTo(center.x + this.size * Math.cos(0 + this.rotation) + this.translation * Math.cos(this.angle),
-							 center.y + this.size * Math.sin(0 + this.rotation) + this.translation * Math.sin(this.angle));
-		for (var i=0; i<this.sides; i++) {
-			ctx.lineTo(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translation * Math.cos(this.angle),
-								 center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translation * Math.sin(this.angle));
+    this.vertices[0] = new point(center.x + this.size * Math.cos(0 + this.rotation) + this.translation * Math.cos(this.angle),
+							                   center.y + this.size * Math.sin(0 + this.rotation) + this.translation * Math.sin(this.angle))
+		ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
+		for (var i=1; i<this.sides; i++) {
+      this.vertices[i] = new point(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translation * Math.cos(this.angle),
+								            center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translation * Math.sin(this.angle));
+			ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
 		}
 		ctx.closePath();
 		ctx.stroke();
@@ -248,6 +251,14 @@ function polygon(sides, size, color, shadowColor, rv, v, angle) {
 		this.size = s;
 		this.draw(center, false);
 	}
+}
+
+/*
+Un punto con coordinate x y
+*/
+function point(x, y) {
+  this.x = x;
+  this.y = y;
 }
 
 /*
