@@ -7,8 +7,7 @@ function roundRectangle(width, height, shadowColor) {
   this.shadowColor = shadowColor.makeColor(1);
   this.color = new color(255, 255, 255).makeColor(1);
   this.radius = 10; //raggio degli angoli rotondi
-  this.x = null; //x dell'angolo in altro a sx
-  this.y = null; //y dell'angolo in altro a sx
+  this.rpoint = null;
   this.arrowOffsetX = null; //distanza delle frecce laterali dal rettangolo
   //vertici delle frecce
   this.leftp1 = null;
@@ -35,15 +34,15 @@ function roundRectangle(width, height, shadowColor) {
     ctx.shadowBlur = 10;
     ctx.shadowColor = this.shadowColor;
     ctx.beginPath();
-    ctx.moveTo(this.x + this.radius, this.y);
-    ctx.lineTo(this.x + this.width - this.radius, this.y);
-    ctx.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + this.radius);
-    ctx.lineTo(this.x + this.width, this.y + this.height - this.radius);
-    ctx.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - this.radius, this.y + this.height);
-    ctx.lineTo(this.x + this.radius, this.y + this.height);
-    ctx.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - this.radius);
-    ctx.lineTo(this.x, this.y + this.radius);
-    ctx.quadraticCurveTo(this.x, this.y, this.x + this.radius, this.y);
+    ctx.moveTo(this.rpoint.x + this.radius, this.rpoint.y);
+    ctx.lineTo(this.rpoint.x + this.width - this.radius, this.rpoint.y);
+    ctx.quadraticCurveTo(this.rpoint.x + this.width, this.rpoint.y, this.rpoint.x + this.width, this.rpoint.y + this.radius);
+    ctx.lineTo(this.rpoint.x + this.width, this.rpoint.y + this.height - this.radius);
+    ctx.quadraticCurveTo(this.rpoint.x + this.width, this.rpoint.y + this.height, this.rpoint.x + this.width - this.radius, this.rpoint.y + this.height);
+    ctx.lineTo(this.rpoint.x + this.radius, this.rpoint.y + this.height);
+    ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y + this.height, this.rpoint.x, this.rpoint.y + this.height - this.radius);
+    ctx.lineTo(this.rpoint.x, this.rpoint.y + this.radius);
+    ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y, this.rpoint.x + this.radius, this.rpoint.y);
     ctx.closePath();
     if (shadows)
       ctx.strokeStyle = this.shadowColor;
@@ -58,15 +57,14 @@ function roundRectangle(width, height, shadowColor) {
   @return true se il mouse si trova all'interno, false altrimenti
   */
   this.drawWithLights = function(startingPoint) {
-    this.x = startingPoint.x;
-    this.y = startingPoint.y;
-    var shadows = mouseInRectangle(this.width, this.height, this.x, this.y);
+    this.rpoint = startingPoint;
+    var shadows = mouseInRectangle(this);
     //se il mouse si trova all'interno del rettangolo disegno le ombre
     if (shadows) {
-      this.draw(new point(this.x-this.x/500, this.y+this.y/500), true);
-      this.draw(new point(this.x+this.x/500, this.y+this.y/500), true);
+      this.draw(new point(this.rpoint.x-this.rpoint.x/500, this.rpoint.y+this.rpoint.y/500), true);
+      this.draw(new point(this.rpoint.x+this.rpoint.x/500, this.rpoint.y+this.rpoint.y/500), true);
     }
-    this.draw(startingPoint, false);
+    this.draw(this.rpoint, false);
     return shadows;
   }
 
@@ -98,12 +96,12 @@ function roundRectangle(width, height, shadowColor) {
   this.drawArrowsWithLights = function() {
     this.arrowOffsetX = this.width/20; 	//distanza delle frecce dai lati del rettangolo e grandezza delle frecce
     //definisco vertici dei trinagoli
-    this.leftp1 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
-    this.leftp2 = new point(this.x - this.arrowOffsetX*2, this.y + this.height/2);
-    this.leftp3 = new point(this.x - this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
-    this.rightp1 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 - this.arrowOffsetX);
-    this.rightp2 = new point(this.x + this.width + this.arrowOffsetX*2, this.y + this.height/2);
-    this.rightp3 = new point(this.x + this.width + this.arrowOffsetX, this.y + this.height/2 + this.arrowOffsetX);
+    this.leftp1 = new point(this.rpoint.x - this.arrowOffsetX, this.rpoint.y + this.height/2 - this.arrowOffsetX);
+    this.leftp2 = new point(this.rpoint.x - this.arrowOffsetX*2, this.rpoint.y + this.height/2);
+    this.leftp3 = new point(this.rpoint.x - this.arrowOffsetX, this.rpoint.y + this.height/2 + this.arrowOffsetX);
+    this.rightp1 = new point(this.rpoint.x + this.width + this.arrowOffsetX, this.rpoint.y + this.height/2 - this.arrowOffsetX);
+    this.rightp2 = new point(this.rpoint.x + this.width + this.arrowOffsetX*2, this.rpoint.y + this.height/2);
+    this.rightp3 = new point(this.rpoint.x + this.width + this.arrowOffsetX, this.rpoint.y + this.height/2 + this.arrowOffsetX);
 
     //disegno le ombre della freccia di sinistra
     if (mouseInTriangle(this.leftp1, this.leftp2, this.leftp3) && this.showLeftArrow) {
@@ -138,24 +136,24 @@ function writingsRectangle(size, color, shadowColor, text) {
   this.radius = 10;
   this.wpoint = null;
   this.rpoint = null;
-  this.rectWidth = ctx.measureText(text).width*5.3;
-  this.rectHeight = this.size*1.5;
+  this.width = ctx.measureText(text).width*5.3;
+  this.height = this.size*1.5;
 
   //disegna il rettangolo con la scritta dentro
   this.draw = function(startingPoint, font) {
     this.wpoint = startingPoint;
-    this.rpoint = new point(startingPoint.x - this.rectWidth*3/25 , startingPoint.y - this.size);
-    ctx.clearRect(this.rpoint.x, this.rpoint.y, this.rectWidth, this.rectHeight);
+    this.rpoint = new point(startingPoint.x - this.width*3/25 , startingPoint.y - this.size);
+    ctx.clearRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
     ctx.fillStyle = backgroundColor.makeColor(1);
     ctx.shadowColor = backgroundColor.makeColor(1);
     ctx.strokeStyle = backgroundColor.makeColor(1);
-    ctx.fillRect(this.rpoint.x, this.rpoint.y, this.rectWidth, this.rectHeight);
+    ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
     ctx.font = this.size+"px "+font;
     ctx.shadowBlur = 10;
     ctx.shadowColor = this.shadowColor;
     ctx.shadowOffsetX = this.size/100;
     ctx.shadowOffsetY = this.size/100;
-    if (mouseInRectangle(this.rectWidth, this.rectHeight, this.rpoint.x, this.rpoint.y)) {
+    if (mouseInRectangle(this)) {
       //this.drawLight(x-this.size/600, y-this.size/600);
       //this.drawLight(x+this.size/1200, y+this.size/1200);
       this.drawShadow(new point(this.wpoint.x-this.size/1200, this.wpoint.y+this.size/1200));
@@ -182,12 +180,12 @@ function writingsRectangle(size, color, shadowColor, text) {
     ctx.shadowColor = this.shadowColor;
     ctx.beginPath();
     ctx.moveTo(this.rpoint.x + this.radius, this.rpoint.y);
-    ctx.lineTo(this.rpoint.x + this.rectWidth - this.radius, this.rpoint.y);
-    ctx.quadraticCurveTo(this.rpoint.x + this.rectWidth, this.rpoint.y, this.rpoint.x + this.rectWidth, this.rpoint.y + this.radius);
-    ctx.lineTo(this.rpoint.x + this.rectWidth, this.rpoint.y + this.rectHeight - this.radius);
-    ctx.quadraticCurveTo(this.rpoint.x + this.rectWidth, this.rpoint.y + this.rectHeight, this.rpoint.x + this.rectWidth - this.radius, this.rpoint.y + this.rectHeight);
-    ctx.lineTo(this.rpoint.x + this.radius, this.rpoint.y + this.rectHeight);
-    ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y + this.rectHeight, this.rpoint.x, this.rpoint.y + this.rectHeight - this.radius);
+    ctx.lineTo(this.rpoint.x + this.width - this.radius, this.rpoint.y);
+    ctx.quadraticCurveTo(this.rpoint.x + this.width, this.rpoint.y, this.rpoint.x + this.width, this.rpoint.y + this.radius);
+    ctx.lineTo(this.rpoint.x + this.width, this.rpoint.y + this.height - this.radius);
+    ctx.quadraticCurveTo(this.rpoint.x + this.width, this.rpoint.y + this.height, this.rpoint.x + this.width - this.radius, this.rpoint.y + this.height);
+    ctx.lineTo(this.rpoint.x + this.radius, this.rpoint.y + this.height);
+    ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y + this.height, this.rpoint.x, this.rpoint.y + this.height - this.radius);
     ctx.lineTo(this.rpoint.x, this.rpoint.y + this.radius);
     ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y, this.rpoint.x + this.radius, this.rpoint.y);
     ctx.closePath();
@@ -201,7 +199,7 @@ function writingsRectangle(size, color, shadowColor, text) {
   //imposta il testo e ricalcola la larghezza del rettangolo
   this.setText = function(text) {
     this.text = text;
-    this.rectWidth = ctx.measureText(text).width*this.size*3/25;
+    this.width = ctx.measureText(text).width*this.size*3/25;
   }
 }
 

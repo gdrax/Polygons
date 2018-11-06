@@ -82,7 +82,6 @@
 		clearArea();
 		switch (gameState) {
 			case "opening":
-				polygon1.drawWithLights(new point(canvas.width/2, canvas.height/4));
 				title.setText("Start game");
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 				break;
@@ -97,7 +96,9 @@
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
 				levelRect.drawArrowsWithLights();
 				break;
-			case "playing": break;
+			case "playing":
+				polygon1.drawWithLights(new point(canvas.width/2, canvas.height/4));
+				break;
 		}
 	}
 
@@ -108,7 +109,6 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
-				polygon1 = new polygon(5, 50, new color(255, 255, 255), new color(255, 0, 0), 0.02, 0.5, 0.5);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
@@ -118,7 +118,9 @@
 				backButton = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), "Back");
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 0, 255));
 				break;
-			case "playing": break;
+			case "playing":
+				polygon1 = new polygon(5, 50, new color(255, 255, 255), new color(255, 0, 0), 0.02, 0.5, 0.5);
+				break;
 		}
 	}
 
@@ -134,7 +136,9 @@
 			case "levels":
 				animation = setInterval(drawArea, 20);
 				break;
-			case "playing": break;
+			case "playing":
+				animation = setInterval(drawArea, 20);
+ 				break;
 		}
 	}
 
@@ -159,7 +163,7 @@
 		switch(gameState) {
 			case "opening":
 				//con il click su "Start game" passo ai livelli
-				if (mouseInRectangle(title.rectWidth, title.rectHeight, title.rpoint.x, title.rpoint.y)) {
+				if (mouseInRectangle(title)) {
 					changeGameState("levels");
 				}
 			break;
@@ -181,8 +185,11 @@
 					}
 				}
 				//click sul bottone back
-				else if (mouseInRectangle(backButton.rectWidth, backButton.rectHeight, backButton.rpoint.x, backButton.rpoint.y)) {
+				else if (mouseInRectangle(backButton)) {
 					changeGameState("opening");
+				}
+				else if (mouseInRectangle(levelName) || mouseInRectangle(levelRect)) {
+				 	changeGameState("playing");
 				}
 				break;
 			case "playing":
@@ -215,10 +222,9 @@
 	Controlla se il mouse si trova nel rettangolo
 	@return: true se il mouse si trova all'interno, false altrimenti
 	*/
-	function mouseInRectangle(width, height, x, y) {
-		if (mousePoint.x >= x && mousePoint.x <= x + width && mousePoint.y >= y && mousePoint.y <= y + height) {
+	function mouseInRectangle(rect) {
+		if (mousePoint.x >= rect.rpoint.x && mousePoint.x <= rect.rpoint.x + rect.width && mousePoint.y >= rect.rpoint.y && mousePoint.y <= rect.rpoint.y + rect.height)
 			return true;
-		}
 		else
 			return false;
 	}
