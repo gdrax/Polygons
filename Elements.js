@@ -87,12 +87,14 @@ function roundRectangle(width, height, shadowColor) {
     else
       ctx.strokeStyle = this.color;
     ctx.shadowColor = this.shadowColor;
+    ctx.fillStyle = backgroundColor.makeColor(1);
 
     ctx.beginPath();
     ctx.moveTo(p1.x - s, p1.y + s);
     ctx.lineTo(p2.x - s, p2.y + s);
     ctx.lineTo(p3.x - s, p3.y + s);
     ctx.lineTo(p1.x - s, p1.y + s);
+    ctx.fill();
     ctx.stroke();
   }
 
@@ -162,9 +164,8 @@ function writingsRectangle(size, color, shadowColor, text) {
     if (mouseInRectangle(this)) {
       //this.drawLight(x-this.size/600, y-this.size/600);
       //this.drawLight(x+this.size/1200, y+this.size/1200);
-      this.drawShadow(new point(this.wpoint.x-this.size/1200, this.wpoint.y+this.size/1200));
-      this.drawShadow(new point(this.wpoint.x+this.size/1200, this.wpoint.y-this.size/1200));
-      this.drawRect(true);
+      this.drawShadow(new point(this.wpoint.x-this.size/500, this.wpoint.y+this.size/500));
+      this.drawShadow(new point(this.wpoint.x+this.size/500, this.wpoint.y-this.size/500));
       this.drawRect(true);
     }
     ctx.strokeStyle = this.color;

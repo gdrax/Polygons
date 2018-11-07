@@ -275,11 +275,12 @@
 			for (var j=0; j<polygons[i].vertices.length; j++) {
 				var x = polygons[i].vertices[j].x;
 				var y = polygons[i].vertices[j].y;
-				if (x + polygons[i].vx >= canvas.width || x - polygons[i].vx <= 0) {
+				//var diffX = (x + polygons[i].vx) ?
+				if (x + polygons[i].vx >= canvas.width || x + polygons[i].vx <= 0) {
 					polygons[i].vx = -polygons[i].vx;
 					break;
 				}
-				if (y + polygons[i].vy >= canvas.height || y - polygons[i].vy <= 0) {
+				if (y + polygons[i].vy >= canvas.height || y + polygons[i].vy <= 0) {
 					polygons[i].vy = -polygons[i].vy;
 					break;
 				}
