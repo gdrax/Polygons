@@ -37,7 +37,7 @@
 	var firstLevel = 1;	//numero del primo livello
 	var lastLevel = 10; //numero dell'ultimo livello
 	var polygons = [];
-	var maxOpeningPolygons = 15;
+	var maxOpeningPolygons = 3;
 	var maxLevelsPolygons = 15;
 	var animation = null;
 	var backgroundColor = new color(10, 10, 10);
@@ -85,8 +85,8 @@
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
-				for (var i=0; i<maxOpeningPolygons; i++)
-					polygons[i].drawWithLights(new point(canvas.width/10+i*10, canvas.width/10+i*20));
+				polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
+				polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 				bouncePolygons();
 				break;
@@ -120,9 +120,10 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
-				for (var i=0; i<maxOpeningPolygons; i++)
-					polygons[i] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*1.5, Math.random()*1.5, Math.random());
+				polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
+																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5);
+				polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
+																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
@@ -150,7 +151,7 @@
 		clearInterval(animation);
 		switch (gameState) {
 			case "opening":
-				animation = setInterval(drawArea, 20);
+				animation = setInterval(drawArea, 50);
 				break;
 			case "levels":
 				animation = setInterval(drawArea, 20);
@@ -275,7 +276,6 @@
 			for (var j=0; j<polygons[i].vertices.length; j++) {
 				var x = polygons[i].vertices[j].x;
 				var y = polygons[i].vertices[j].y;
-				//var diffX = (x + polygons[i].vx) ?
 				if (x + polygons[i].vx >= canvas.width || x + polygons[i].vx <= 0) {
 					polygons[i].vx = -polygons[i].vx;
 					break;
@@ -283,6 +283,15 @@
 				if (y + polygons[i].vy >= canvas.height || y + polygons[i].vy <= 0) {
 					polygons[i].vy = -polygons[i].vy;
 					break;
+				}
+			}
+		}
+		for (var i=0; i<polygons.length; i++) {
+			console.log("sargio	");
+			for (var j=i; j<polygons.length; j++) {
+				if(i!=j && detectCollision(polygons[i], polygons[j])) {
+					polygons[i].invertSpeed();
+					polygons[j].invertSpeed();
 				}
 			}
 		}

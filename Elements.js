@@ -260,6 +260,11 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 		this.size = s;
 		this.draw(center, false);
 	}
+
+  this.invertSpeed = function() {
+    this.vx = -this.vx;
+    this.vy = -this.vy;
+  }
 }
 
 /*
