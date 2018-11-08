@@ -17,6 +17,7 @@
 </style>
 <body>
 <canvas id="canvas" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)" onclick="mouseClick()"> </canvas>
+<script type="text/javascript" src="./Utils.js"></script>
 <script type="text/javascript" src="./Collisions.js"></script>
 <script type="text/javascript" src="./Elements.js"></script>
 <script type="text/javascript">
@@ -38,9 +39,9 @@
 	var lastLevel = 10; //numero dell'ultimo livello
 	var polygons = [];
 	var maxOpeningPolygons = 3;
-	var maxLevelsPolygons = 15;
+	var maxLevelsPolygons = 2;
 	var animation = null;
-	var backgroundColor = new color(10, 10, 10);
+	var backgroundColor = new color(10, 10, 10).makeColor(1);
 
 	clearArea();
 	//imposto primo stato di gioco
@@ -70,7 +71,7 @@
 	*/
 	function clearArea() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle = backgroundColor.makeColor(1);
+		ctx.fillStyle = backgroundColor;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 	}
 
@@ -119,7 +120,7 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
+				title = new writingsRectangle(canvas.height/5, new color(255, 255, 255), new color(0, 255, 0), "Start game");
 				polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
 																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5);
 				polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
@@ -151,7 +152,7 @@
 		clearInterval(animation);
 		switch (gameState) {
 			case "opening":
-				animation = setInterval(drawArea, 50);
+				animation = setInterval(drawArea, 2000);
 				break;
 			case "levels":
 				animation = setInterval(drawArea, 20);
@@ -285,7 +286,7 @@
 					break;
 				}
 			}
-		}
+		}/*
 		for (var i=0; i<polygons.length; i++) {
 			console.log("sargio	");
 			for (var j=i; j<polygons.length; j++) {
@@ -294,7 +295,7 @@
 					polygons[j].invertSpeed();
 				}
 			}
-		}
+		}*/
 	}
 </script>
 </body>

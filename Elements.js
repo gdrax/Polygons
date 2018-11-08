@@ -31,14 +31,11 @@ function roundRectangle(width, height, shadowColor) {
   @param shadows: true per disegnare solo l'ombra
   */
   this.draw = function(point, shadows) {
-    ctx.clearRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
-    ctx.fillStyle = backgroundColor.makeColor(1);
-    ctx.shadowColor = backgroundColor.makeColor(1);
-    ctx.strokeStyle = backgroundColor.makeColor(1);
+    //pulisco l'area
+    setColors(null, null, null);
     ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
-    ctx.fillStyle = this.color;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = this.shadowColor;
+
+    //disegno rettangolo
     ctx.beginPath();
     ctx.moveTo(this.rpoint.x + this.radius, this.rpoint.y);
     ctx.lineTo(this.rpoint.x + this.width - this.radius, this.rpoint.y);
@@ -50,6 +47,7 @@ function roundRectangle(width, height, shadowColor) {
     ctx.lineTo(this.rpoint.x, this.rpoint.y + this.radius);
     ctx.quadraticCurveTo(this.rpoint.x, this.rpoint.y, this.rpoint.x + this.radius, this.rpoint.y);
     ctx.closePath();
+    setColors(this.color, this.shadowColor, null);
     if (shadows)
       ctx.strokeStyle = this.shadowColor;
     else
@@ -68,7 +66,6 @@ function roundRectangle(width, height, shadowColor) {
     //se il mouse si trova all'interno del rettangolo disegno le ombre
     if (shadows) {
       this.draw(new point(this.rpoint.x-this.rpoint.x/500, this.rpoint.y+this.rpoint.y/500), true);
-      this.draw(new point(this.rpoint.x+this.rpoint.x/500, this.rpoint.y+this.rpoint.y/500), true);
     }
     this.draw(this.rpoint, false);
     return shadows;
@@ -81,20 +78,19 @@ function roundRectangle(width, height, shadowColor) {
   @shadows: true per disegnare l'ombra, false per disegnare il triangolo
   */
   this.drawArrow = function(p1, p2, p3, s, shadows) {
-    ctx.shadowBlur = 10;
-    if (shadows)
-      ctx.strokeStyle = this.shadowColor;
-    else
-      ctx.strokeStyle = this.color;
-    ctx.shadowColor = this.shadowColor;
-    ctx.fillStyle = backgroundColor.makeColor(1);
-
     ctx.beginPath();
     ctx.moveTo(p1.x - s, p1.y + s);
     ctx.lineTo(p2.x - s, p2.y + s);
     ctx.lineTo(p3.x - s, p3.y + s);
     ctx.lineTo(p1.x - s, p1.y + s);
+    setColors(this.color, null, null);
     ctx.fill();
+    setColors(this.color, this.shadowColor, null);
+    if (shadows) {
+      ctx.strokeStyle = this.shadowColor;
+    }
+    else
+      ctx.strokeStyle = this.color;
     ctx.stroke();
   }
 
@@ -151,24 +147,16 @@ function writingsRectangle(size, color, shadowColor, text) {
   this.draw = function(startingPoint, font) {
     this.wpoint = startingPoint;
     this.rpoint = new point(startingPoint.x - this.width*3/25 , startingPoint.y - this.size);
-    ctx.clearRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
-    ctx.fillStyle = backgroundColor.makeColor(1);
-    ctx.shadowColor = backgroundColor.makeColor(1);
-    ctx.strokeStyle = backgroundColor.makeColor(1);
+    setColors(null, null, null);
     ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
     ctx.font = this.size+"px "+font;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = this.shadowColor;
-    ctx.shadowOffsetX = this.size/100;
-    ctx.shadowOffsetY = this.size/100;
+
     if (mouseInRectangle(this)) {
-      //this.drawLight(x-this.size/600, y-this.size/600);
-      //this.drawLight(x+this.size/1200, y+this.size/1200);
       this.drawShadow(new point(this.wpoint.x-this.size/500, this.wpoint.y+this.size/500));
       this.drawShadow(new point(this.wpoint.x+this.size/500, this.wpoint.y-this.size/500));
       this.drawRect(true);
     }
-    ctx.strokeStyle = this.color;
+    setColors(this.color, this.shadowColor, null);
     ctx.strokeText(this.text, this.wpoint.x, this.wpoint.y);
     this.drawRect(false);
 
@@ -176,15 +164,13 @@ function writingsRectangle(size, color, shadowColor, text) {
 
   //disegna l'ombra
   this.drawShadow = function(point) {
-    ctx.shadowColor = this.shadowColor;
-    ctx.strokeStyle = this.shadowColor;
+    setColors(this.shadowColor, this.shadowColor, null);
     ctx.strokeText(this.text, point.x, point.y);
   }
 
   //disegna il rettangolo
   this.drawRect = function(shadows) {
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = this.shadowColor;
+    setColors(this.color, this.shadowColor, null);
     ctx.beginPath();
     ctx.moveTo(this.rpoint.x + this.radius, this.rpoint.y);
     ctx.lineTo(this.rpoint.x + this.width - this.radius, this.rpoint.y);
@@ -228,12 +214,11 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
   this.vertices = [];
 
 	this.draw = function(center, shadows) {
+    setColors(this.color, this.shadowColor, null);
 	  if (shadows)
 		  ctx.strokeStyle = this.shadowColor;
 	  else
 		  ctx.strokeStyle = this.color;
-		ctx.shadowColor = this.shadowColor;
-		this.shadowBlur = 10;
 		ctx.beginPath();
     this.vertices[0] = new point(center.x + this.size * Math.cos(0 + this.rotation) + this.translationX * Math.cos(this.angle),
 							                   center.y + this.size * Math.sin(0 + this.rotation) + this.translationY * Math.sin(this.angle))
