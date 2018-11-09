@@ -231,16 +231,18 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 		ctx.closePath();
     ctx.fill();
 		ctx.stroke();
-		this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
-		this.translationX += this.vx;
-    this.translationY += this.vy;
+    if (!shadows) {
+  		this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
+  		this.translationX += this.vx;
+      this.translationY += this.vy;
+    }
 	}
 
 	this.drawWithLights = function(center) {
 		var s = this.size;
-		this.size = s*1.001;
+		this.size = s-s/200;
 		this.draw(center, true);
-		this.size = s*0.009;
+		this.size = s+s/200;
 		this.draw(center, true)
 		this.size = s;
 		this.draw(center, false);

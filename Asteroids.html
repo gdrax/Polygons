@@ -86,8 +86,8 @@
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
-				polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
-				polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
+				polygons[0].draw(new point(canvas.width/10, canvas.width/10), false);
+				polygons[1].draw(new point(canvas.width/5, canvas.width/5), false);
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 				bouncePolygons();
 				break;
@@ -98,7 +98,7 @@
 				levelName.setText(currentLevel);
 				backButton.setText("Back");
 				for (var i=0; i<maxLevelsPolygons; i++)
-					polygons[i].drawWithLights(new point(canvas.width/10+i*10, canvas.width/10+i*20));
+					polygons[i].draw(new point(canvas.width/10+i*10, canvas.width/10+i*20), false);
 				levelName.draw(new point(canvas.width*15/34, canvas.height*4/5), "Serif");
 				backButton.draw(new point(canvas.width/20, canvas.height/15), "Serif");
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
@@ -107,7 +107,7 @@
 				break;
 			case "playing":
 				for (var i=0; i<10; i++) {
-					polygons[i].drawWithLights(new point(canvas.width/2+10*i, canvas.height/4-10*i));
+					polygons[i].draw(new point(canvas.width/2+50*i, canvas.height/4+30*i), false);
 				}
 				bouncePolygons();
 				break;
@@ -120,7 +120,7 @@
 	function initializeObjects() {
 		switch (gameState) {
 			case "opening":
-				title = new writingsRectangle(canvas.height/5, new color(255, 255, 255), new color(0, 255, 0), "Start game");
+				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
 				polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
 																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5);
 				polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
@@ -132,14 +132,14 @@
 				currentLevel = "Level "+levelNumber;
 				for (var i=0; i<maxLevelsPolygons; i++)
 					polygons[i] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*1.5, Math.random()*1.5, Math.random());
+																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*2.5, Math.random()*1.5, Math.random());
 				levelName = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), currentLevel);
 				backButton = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), "Back");
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 0, 255));
 				break;
 			case "playing":
 				for (var i=0; i<10; i++) {
-					polygons[i] = new polygon(6, i*5, new color(255, 255, 255), new color(200-20*i, 0+10*i, 255), 0, 0.05*i+0.05, 0.05*i+0.05, 0.05*i+0.05);
+					polygons[i] = new polygon(6, i*5, new color(255, 255, 255), new color(200-20*i, 0+10*i, 255), 0, 0.5*i+0.5, 0.5*i+0.5, 0.05*i+0.05);
 				}
 				break;
 		}
@@ -152,7 +152,7 @@
 		clearInterval(animation);
 		switch (gameState) {
 			case "opening":
-				animation = setInterval(drawArea, 2000);
+				animation = setInterval(drawArea, 20);
 				break;
 			case "levels":
 				animation = setInterval(drawArea, 20);
