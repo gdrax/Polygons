@@ -67,9 +67,19 @@ function overlaps(p1, p2) {
 
 //restituisce true se il punto è contenuto nella figura, false altrimenti
 function contains(shape, point) {
+  var cn = 0;
   for (var i=0; i<shape.vertices.length; i++) {
-    
+    if (crossing(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], point))
+      cn++;
   }
+  if (cn%2 == 0)
+    return false;
+  else
+    return true;
+}
+
+function crossing(e1, e2, p) {
+  //UNA RETTA E ORIZZONTALE
 }
 
 /*==============Oggetti==============*/
@@ -92,4 +102,11 @@ function vector(a, b) {
   this.dotp = function(p) {
     return this.a * p.x + this.b * p.y;
   }
+}
+
+function rect(a, b, c) {
+  this.a = a;
+  this.b = b;
+  this.q = q;
+  this.m = a==0 ? null : a/b;
 }
