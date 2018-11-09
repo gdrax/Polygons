@@ -57,11 +57,19 @@ function makeProjection(shape, axis) {
   return new projection(min, max);
 }
 
+//calcola se due proiezioni si sovrappongono
 function overlaps(p1, p2) {
   if (p1.max < p2.min || p1.min > p2.max)
     return false;
   else
     return true;
+}
+
+//restituisce true se il punto è contenuto nella figura, false altrimenti
+function contains(shape, point) {
+  for (var i=0; i<shape.vertices.length; i++) {
+    
+  }
 }
 
 /*==============Oggetti==============*/

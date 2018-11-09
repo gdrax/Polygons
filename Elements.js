@@ -231,6 +231,7 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 		ctx.closePath();
     ctx.fill();
 		ctx.stroke();
+    //aggiorno rotazione e traslazione solo quando non disegno le ombre
     if (!shadows) {
   		this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
   		this.translationX += this.vx;
