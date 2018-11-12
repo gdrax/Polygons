@@ -220,14 +220,10 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 	  else
 		  ctx.strokeStyle = this.color;
 		ctx.beginPath();
-    this.vertices[0] = new point(center.x + this.size * Math.cos(0 + this.rotation) + this.translationX * Math.cos(this.angle),
-							                   center.y + this.size * Math.sin(0 + this.rotation) + this.translationY * Math.sin(this.angle))
+
 		ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
-		for (var i=1; i<this.sides; i++) {
-      this.vertices[i] = new point(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translationX * Math.cos(this.angle),
-								                   center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translationY * Math.sin(this.angle));
+		for (var i=1; i<this.sides; i++)
 			ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
-		}
 		ctx.closePath();
     ctx.fill();
 		ctx.stroke();
@@ -240,12 +236,18 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
 	}
 
 	this.drawWithLights = function(center) {
-		var s = this.size;
-		this.size = s-s/200;
-		this.draw(center, true);
-		this.size = s+s/200;
-		this.draw(center, true)
-		this.size = s;
+    for (var i=0; i<this.sides; i++) {
+      this.vertices[i] = new point(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translationX * Math.cos(this.angle),
+                                   center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translationY * Math.sin(this.angle));
+    }
+    if (contains(this, mousePoint)) {
+  		var s = this.size;
+  		this.size = s-s/200;
+  		this.draw(center, true);
+  		this.size = s+s/200;
+  		this.draw(center, true)
+  		this.size = s;
+    }
 		this.draw(center, false);
 	}
 

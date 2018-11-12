@@ -86,8 +86,8 @@
 		switch (gameState) {
 			case "opening":
 				title.setText("Start game");
-				polygons[0].draw(new point(canvas.width/10, canvas.width/10), false);
-				polygons[1].draw(new point(canvas.width/5, canvas.width/5), false);
+				polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
+				polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
 				title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 				bouncePolygons();
 				break;
@@ -98,7 +98,7 @@
 				levelName.setText(currentLevel);
 				backButton.setText("Back");
 				for (var i=0; i<maxLevelsPolygons; i++)
-					polygons[i].draw(new point(canvas.width/10+i*10, canvas.width/10+i*20), false);
+					polygons[i].drawWithLights(new point(canvas.width/10+i*10, canvas.width/10+i*20));
 				levelName.draw(new point(canvas.width*15/34, canvas.height*4/5), "Serif");
 				backButton.draw(new point(canvas.width/20, canvas.height/15), "Serif");
 				levelRect.drawWithLights(new point(canvas.width/6, canvas.height/8));
@@ -107,7 +107,7 @@
 				break;
 			case "playing":
 				for (var i=0; i<10; i++) {
-					polygons[i].draw(new point(canvas.width/2+50*i, canvas.height/4+30*i), false);
+					polygons[i].drawWithLights(new point(canvas.width/2+50*i, canvas.height/4+30*i));
 				}
 				bouncePolygons();
 				break;

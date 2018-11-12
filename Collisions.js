@@ -68,18 +68,50 @@ function overlaps(p1, p2) {
 //restituisce true se il punto è contenuto nella figura, false altrimenti
 function contains(shape, point) {
   var cn = 0;
+  //conto quanti lati incrociano il semiasse orizzontale che parte dal punto 'point'
   for (var i=0; i<shape.vertices.length; i++) {
     if (crossing(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], point))
       cn++;
   }
-  if (cn%2 == 0)
-    return false;
-  else
+  //se un solo lato incrocia il semiasse, il punto è all'interno della figura (il modulo serve nel caso la figura sia concava)
+  if (cn%2 == 1)
     return true;
+  else
+    return false;
 }
 
-function crossing(e1, e2, p) {
-  //UNA RETTA E ORIZZONTALE
+//calcola se il semiasse orizzontale che parte da p incrocia il segmento v1-v2 (lato del poligono)
+function crossing(v1, v2, p) {
+  //retta orizzontale, non si incrocia
+  if (v1.y == v2.y)
+      return false
+  //retta verticale
+  if (v1.x == v2.x)
+    //se la y del punto p è compresa nel segmento p si trova a sinistra della retta, si incrociano
+    if (v1.x > p.x && beetweenY(v1, v2, p))
+      return true;
+    else
+      return false;
+  //se la y del punto è fuori dall'intervallo dei due vertici, non si incrociano
+  if (!beetweenY(v1, v2, p) || (v1.x < p.x && v2.x < p.x))
+    return false;
+  //calcolo retta passante per i due vertici
+  var r = new rect((v1.y - v2.y)/(v1.x - v2.x), (v1.x*v2.y - v2.x*v1.y)/(v1.x - v2.x));
+  //calcolo la x dell'incrocio tra le due rette
+  var x = (p.y - r.q)/r.m;
+  //se il punto è a sinistra del punto di incontro si incrociano
+  if (x > p.x)
+    return true;
+  else
+    return false;
+}
+
+//calcola se l'ordinata del punto p è compresa tra quelle dei vertici v1 e v2
+function beetweenY(v1, v2, p) {
+  if (p.y > Math.min(v1.y, v2.y) && p.y < Math.max(v1.y, v2.y))
+    return true;
+  else
+    return false;
 }
 
 /*==============Oggetti==============*/
@@ -104,9 +136,7 @@ function vector(a, b) {
   }
 }
 
-function rect(a, b, c) {
-  this.a = a;
-  this.b = b;
+function rect(m, q) {
+  this.m = m;
   this.q = q;
-  this.m = a==0 ? null : a/b;
 }
