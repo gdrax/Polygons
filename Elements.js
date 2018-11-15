@@ -255,6 +255,36 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
   }
 }
 
+function ball(radius, color, shadowColor) {
+  this.center = null;
+  this.radius = radius;
+  this.color = color.makeColor(1);
+  this.shadowColor = shadowColor.makeColor(1);
+
+  this.draw = function(shadows) {
+    setColors(this.color, this.shadowColor, null);
+    if (shadows)
+      ctx.strokeStyle = this.shadowColor;
+    else
+      ctx.strokeStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.center.x, this.center.y, this.radius, 0, 2*Math.PI, false);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  this.drawWithLights = function(center) {
+    this.center = center;
+    var r = this.radius;
+    if (mouseInCircle(this.center, this.radius)) {
+      this.radius += 0.001;
+      this.draw(true);
+    }
+    this.radius = r;
+    this.draw(false);
+  }
+}
+
 /*
 Un punto con coordinate x y
 */
