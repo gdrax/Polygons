@@ -255,11 +255,24 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
   }
 }
 
-function ball(radius, color, shadowColor) {
-  this.center = null;
+/*
+Oggetto che modella un cerchio
+*/
+function ball(center, radius, color, shadowColor, initialVx, initialVy) {
+  this.center = center;
   this.radius = radius;
   this.color = color.makeColor(1);
   this.shadowColor = shadowColor.makeColor(1);
+  this.vx = initialVx;
+  this.vy = initialVy;
+
+  this.angle = function() {
+    return Math.atan2(this.vx, this.vy);
+  }
+
+  this.v = function() {
+    return Math.sqrt(this.vx * this.vx + this.y * this.y);
+  }
 
   this.draw = function(shadows) {
     setColors(this.color, this.shadowColor, null);
@@ -273,8 +286,7 @@ function ball(radius, color, shadowColor) {
     ctx.stroke();
   }
 
-  this.drawWithLights = function(center) {
-    this.center = center;
+  this.drawWithLights = function() {
     var r = this.radius;
     if (mouseInCircle(this.center, this.radius)) {
       this.radius += 0.001;
@@ -282,6 +294,21 @@ function ball(radius, color, shadowColor) {
     }
     this.radius = r;
     this.draw(false);
+    this.borderBounce();
+    this.move();
+  }
+
+  this.move = function() {
+    this.center.x += this.vx;
+    this.center.y += this.vy;
+  }
+
+  this.borderBounce = function() {
+    var nextCenter = new point(this.center.x + this.vx, this.center.y + this.vy);
+    if (nextCenter.x >= canvas.width || nextCenter.x <= 0)
+      this.vx = -this.vx;
+    if (nextCenter.y >= canvas.height || nextCenter.y <= 0)
+      this.vy = -this.vy;
   }
 }
 
