@@ -1,3 +1,28 @@
+function detectBallCollision(ball, shape) {
+  for (var i=0; i<shape.vertices.length; i++) {
+    console.log(rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])));
+    if (rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) <= ball.radius) {
+      ball.vx = -ball.vx;
+      ball.vy = -ball.vy;
+    }
+  }
+}
+
+function detectCollision2(s1, s2) {
+  //genero assi per il primo oggetto
+  var axes = getAxes(s1);
+  for (var i=0; i<axes.length; i++) {
+    var axis = axes[i];
+    //genero proiezioni delle due figure sull'asse
+    var p1 = makeProjection(s1, axis);
+    var p2 = makeCircleProjection(s2, axis);
+    if (!overlaps(p1, p2)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /*
 Determina se due oggetti stanno collidendo o no
 */
@@ -55,6 +80,11 @@ function makeProjection(shape, axis) {
   return new projection(min, max);
 }
 
+function makeCircleProjection(shape, axis) {
+  var center = axis.dotp(shape.center);
+  return new projection(center - shape.radius, center + shape.radius);
+}
+
 //calcola se due proiezioni si sovrappongono
 function overlaps(p1, p2) {
   if (p1.max < p2.min || p1.min > p2.max)
@@ -110,6 +140,26 @@ function beetweenY(v1, v2, p) {
     return true;
   else
     return false;
+}
+
+//calcola la distanza tra due punti
+function distance(p1, p2) {
+  return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+}
+
+function rectToPoints(p1, p2) {
+  if (p1.x == p2.x)
+    //retta verticale
+    return new rect(null, p1.x);
+  else
+    return new rect((p1.y - p2.y)/(p1.x - p2.x), (p1.x * p2.y - p2.x * p1.y)/(p1.x - p2.x));
+}
+
+function rectDistance(p, r) {
+  if (r.m == null)
+    return distance(p, new point(r.q, p.y));
+  else
+    return Math.abs(p.y - (r.m * p.x + r.q))/Math.sqrt(1 + r.m * r.m);
 }
 
 /*==============Oggetti==============*/
