@@ -152,8 +152,8 @@ function writingsRectangle(size, color, shadowColor, text) {
     ctx.font = this.size+"px "+font;
 
     if (mouseInRectangle(this)) {
-      this.drawShadow(new point(this.wpoint.x-this.size/500, this.wpoint.y+this.size/500));
       this.drawShadow(new point(this.wpoint.x+this.size/500, this.wpoint.y-this.size/500));
+      this.drawShadow(new point(this.wpoint.x-this.size/500, this.wpoint.y+this.size/500));
       this.drawRect(true);
     }
     setColors(this.color, this.shadowColor, null);
@@ -242,8 +242,6 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
     }
     if (contains(this, mousePoint)) {
   		var s = this.size;
-  		this.size = s-s/200;
-  		this.draw(center, true);
   		this.size = s+s/200;
   		this.draw(center, true)
   		this.size = s;

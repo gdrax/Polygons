@@ -11,7 +11,6 @@ function detectCollision(s1, s2) {
     var p1 = makeProjection(s1, axis);
     var p2 = makeProjection(s2, axis);
     if (!overlaps(p1, p2)) {
-      console.log("p1 not overlaps");
       return false;
     }
   }
@@ -22,7 +21,6 @@ function detectCollision(s1, s2) {
     var p1 = makeProjection(s1, axis);
     var p2 = makeProjection(s2, axis);
     if (!overlaps(p1, p2)) {
-      console.log("p2 not overlaps");
       return false;
     }
   }
