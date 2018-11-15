@@ -305,9 +305,9 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
 
   this.borderBounce = function() {
     var nextCenter = new point(this.center.x + this.vx, this.center.y + this.vy);
-    if (nextCenter.x >= canvas.width || nextCenter.x <= 0)
+    if (nextCenter.x + this.radius >= canvas.width || nextCenter.x - this.radius <= 0)
       this.vx = -this.vx;
-    if (nextCenter.y >= canvas.height || nextCenter.y <= 0)
+    if (nextCenter.y + this.radius >= canvas.height || nextCenter.y - this.radius <= 0)
       this.vy = -this.vy;
   }
 }
