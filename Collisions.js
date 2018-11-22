@@ -1,7 +1,7 @@
 function detectBallCollision(ball, shape) {
   for (var i=0; i<shape.vertices.length; i++) {
     console.log(rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])));
-    if (rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) <= ball.radius) {
+    if (rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) <= ball.radius && beetweenY(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], ball.center)) {
       ball.vx = -ball.vx;
       ball.vy = -ball.vy;
     }
@@ -29,7 +29,6 @@ Determina se due oggetti stanno collidendo o no
 function detectCollision(s1, s2) {
   //genero assi per il primo oggetto
   var axes = getAxes(s1);
-  console.log(axes.length);
   for (var i=0; i<axes.length; i++) {
     var axis = axes[i];
     //genero proiezioni delle due figure sull'asse
@@ -152,14 +151,16 @@ function rectToPoints(p1, p2) {
     //retta verticale
     return new rect(null, p1.x);
   else
-    return new rect((p1.y - p2.y)/(p1.x - p2.x), (p1.x * p2.y - p2.x * p1.y)/(p1.x - p2.x));
+    return new rect((p1.y - p2.y)/(p1.x - p2.x), -p2.x*(p1.y - p2.y)/(p1.x - p2.x) + p2.y);
 }
 
 function rectDistance(p, r) {
   if (r.m == null)
     return distance(p, new point(r.q, p.y));
-  else
-    return Math.abs(p.y - (r.m * p.x + r.q))/Math.sqrt(1 + r.m * r.m);
+  else {
+    r.generalEq();
+    return Math.abs(r.a*p.x + r.b*p.y + r.c)/Math.sqrt(r.a*r.a + r.b*r.b);
+  }
 }
 
 /*==============Oggetti==============*/
@@ -187,4 +188,24 @@ function vector(a, b) {
 function rect(m, q) {
   this.m = m;
   this.q = q;
+  this.a = null;
+  this.b = null;
+  this.c = null;
+
+  this.generalEq = function() {
+    this.a = -this.m;
+    this.b = 1;
+    this.c = -this.q;
+  }
+
+  this.computeMQ = function() {
+    if (b != 0) {
+      this.m = -this.a/this.b;
+      this.q = -this.c/this.b;
+    }
+    else {
+      this.m = null;
+      this.q = null;
+    }
+  }
 }

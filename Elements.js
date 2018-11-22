@@ -312,6 +312,7 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
   }
 }
 
+
 /*
 Un punto con coordinate x y
 */
