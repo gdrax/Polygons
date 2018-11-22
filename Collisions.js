@@ -8,21 +8,6 @@ function detectBallCollision(ball, shape) {
   }
 }
 
-function detectCollision2(s1, s2) {
-  //genero assi per il primo oggetto
-  var axes = getAxes(s1);
-  for (var i=0; i<axes.length; i++) {
-    var axis = axes[i];
-    //genero proiezioni delle due figure sull'asse
-    var p1 = makeProjection(s1, axis);
-    var p2 = makeCircleProjection(s2, axis);
-    if (!overlaps(p1, p2)) {
-      return false;
-    }
-  }
-  return true;
-}
-
 /*
 Determina se due oggetti stanno collidendo o no
 */
@@ -77,11 +62,6 @@ function makeProjection(shape, axis) {
       max = p;
   }
   return new projection(min, max);
-}
-
-function makeCircleProjection(shape, axis) {
-  var center = axis.dotp(shape.center);
-  return new projection(center - shape.radius, center + shape.radius);
 }
 
 //calcola se due proiezioni si sovrappongono
