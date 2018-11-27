@@ -107,16 +107,15 @@
 				bouncePolygons();
 				break;
 			case "playing":
-				for (var i=1; i<2; i++) {
-					polygons[i-1].drawWithLights(new point(canvas.width/2+150*i, canvas.height/4+20*i));
-				}
+				polygons[0].drawWithLights(new point(canvas.width*8/9, canvas.height/2));
 				myBall.drawWithLights();
-				for (var i=0; i<polygons.length; i++) {
-					if (detectBallCollision(myBall, polygons[i])) {
+				//for (var i=0; i<polygons.length; i++) {
+					if (detectCircleShapeCollision(myBall, polygons[0])) {
+						console.log("true");
 						myBall.vx = -myBall.vx;
 						myBall.vy = -myBall.vy;
 					}
-				}
+				//}
 				break;
 		}
 	}
@@ -128,6 +127,7 @@
 		switch (gameState) {
 			case "opening":
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
+				clearPolygons();
 				polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
 																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5);
 				polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
@@ -137,6 +137,7 @@
 				//aggiorno il nome del livello
 				levelNumber = 1;
 				currentLevel = "Level "+levelNumber;
+				clearPolygons();
 				for (var i=0; i<maxLevelsPolygons; i++)
 					polygons[i] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
 																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*2.5, Math.random()*1.5, Math.random());
@@ -145,10 +146,9 @@
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 0, 255));
 				break;
 			case "playing":
-				for (var i=1; i<2; i++) {
-					polygons[i-1] = new polygon(6, i*60, new color(255, 255, 255), new color(200-20*i, 0+10*i, 255), 0, 0, 0, 0);
-				}
-				myBall = new ball(new point(canvas.width/2, canvas.height/2), 20, new color(255, 255, 255), new color(0, 255, 0), 4, 4);
+				clearPolygons();
+				polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0);
+				myBall = new ball(new point(canvas.width*5/6, canvas.height/4), 40, new color(255, 255, 255), new color(0, 255, 0), 4, 4);
 				break;
 		}
 	}
@@ -224,6 +224,11 @@
 			case "playing":
 				break
 		}
+	}
+
+	function clearPolygons() {
+		polygons = null;
+		polygons = [];
 	}
 </script>
 </body>

@@ -1,11 +1,15 @@
 function detectBallCollision(ball, shape) {
-  for (var i=0; i<shape.vertices.length; i++) {
-    console.log(rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])));
-    if (rectDistance(ball.center, rectToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) <= ball.radius && beetweenY(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], ball.center)) {
+  /*for (var i=0; i<shape.vertices.length; i++) {
+    console.log(lineDistance(ball.center, lineToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) < ball.radius && beetweenY(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], ball.center))
+    if (lineDistance(ball.center, lineToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) < ball.radius &&
+        beetweenY(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], ball.center)) {
       ball.vx = -ball.vx;
       ball.vy = -ball.vy;
     }
-  }
+  }*/
+  if (detectCircleShapeCollision(ball, shape))
+    ball.vx = -ball.vx;
+    ball.vy = -ball.vy;
 }
 
 /*
@@ -29,6 +33,19 @@ function detectCollision(s1, s2) {
     var axis = axes[i];
     var p1 = makeProjection(s1, axis);
     var p2 = makeProjection(s2, axis);
+    if (!overlaps(p1, p2)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function detectCircleShapeCollision(circle, shape) {
+  var axes = getAxes(shape);
+  for (var i=0; i<axes.length; i++) {
+    var axis = axes[i];
+    var p1 = makeCircleProjection(circle, axis);
+    var p2 = makeProjection(shape, axis);
     if (!overlaps(p1, p2)) {
       return false;
     }
@@ -61,6 +78,12 @@ function makeProjection(shape, axis) {
     if (p > max)
       max = p;
   }
+  return new projection(min, max);
+}
+
+function makeCircleProjection(circle, axis) {
+  var min = axis.dotp(circle.center) + circle.radius;
+  var max = axis.dotp(circle.center) - circle.radius;
   return new projection(min, max);
 }
 
@@ -126,7 +149,7 @@ function distance(p1, p2) {
   return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
-function rectToPoints(p1, p2) {
+function lineToPoints(p1, p2) {
   if (p1.x == p2.x)
     //retta verticale
     return new rect(null, p1.x);
@@ -134,7 +157,7 @@ function rectToPoints(p1, p2) {
     return new rect((p1.y - p2.y)/(p1.x - p2.x), -p2.x*(p1.y - p2.y)/(p1.x - p2.x) + p2.y);
 }
 
-function rectDistance(p, r) {
+function lineDistance(p, r) {
   if (r.m == null)
     return distance(p, new point(r.q, p.y));
   else {
