@@ -40,15 +40,23 @@ function detectCollision(s1, s2) {
   return true;
 }
 
-function detectCircleShapeCollision(circle, shape) {
+function detectCircleShapeCollision(ball, shape) {
   var axes = getAxes(shape);
   for (var i=0; i<axes.length; i++) {
     var axis = axes[i];
-    var p1 = makeCircleProjection(circle, axis);
+    var p1 = makeCircleProjection(ball, axis);
     var p2 = makeProjection(shape, axis);
     if (!overlaps(p1, p2)) {
       return false;
     }
+  }
+
+  var closestVertex = findClosestVertex(ball, shape);
+  var axis = findCircleAxis(ball, closestVertex);
+  var p1 = makeCircleProjection(ball, axis);
+  var p2 = makeProjection(shape, axis);
+  if (!overlaps(p1, p2)) {
+    return false;
   }
   return true;
 }
@@ -65,6 +73,12 @@ function getAxes(shape) {
     axes[i] = normal;
   }
   return axes;
+}
+
+function findCircleAxis(ball, closestVertex) {
+  var edge = closestVertex.subtract(ball.center);
+  var normal = edge.perp();
+  return normal;
 }
 
 //calcola gli estremi della proiezione di una figura su una retta
@@ -164,6 +178,16 @@ function lineDistance(p, r) {
     r.generalEq();
     return Math.abs(r.a*p.x + r.b*p.y + r.c)/Math.sqrt(r.a*r.a + r.b*r.b);
   }
+}
+
+function findClosestVertex(ball, shape) {
+  var minDistance = 2000;
+  var closestVertex = null;
+  for (var i=0; i<shape.vertices.length; i++) {
+    if (distance(shape.vertices[i], ball.center) < minDistance)
+      closestVertex = shape.vertices[i];
+  }
+  return closestVertex;
 }
 
 /*==============Oggetti==============*/
