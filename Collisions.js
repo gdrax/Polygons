@@ -47,6 +47,8 @@ function detectCircleShapeCollision(ball, shape) {
     drawLine(axis);
     var p1 = makeCircleProjection(ball, axis);
     var p2 = makeProjection(shape, axis);
+    p1.print();
+    p2.print();
     if (!overlaps(p1, p2)) {
       return false;
     }
@@ -83,7 +85,8 @@ function findCircleAxis(ball, closestVertex) {
 }
 
 //calcola gli estremi della proiezione di una figura su una retta
-function makeProjection(shape, axis) {
+function makeProjection(shape, a) {
+  axis = a.normalize();
   var min = axis.dotp(shape.vertices[0]);
   var max = min;
   for (var i=1; i<shape.vertices.length; i++) {
@@ -96,9 +99,22 @@ function makeProjection(shape, axis) {
   return new projection(min, max);
 }
 
-function makeCircleProjection(circle, axis) {
+function makeCircleProjection(circle, a) {
+  axis = a.normalize();
+  //console.log(axis.a+"  "+axis.b);
   var v1 = translate(circle.center, circle.radius, axis);
   var v2 = translate(circle.center, circle.radius, axis.inverse());
+  //console.log("1: "+v1.x+", "+v1.y+"    2: "+v2.x+", "+v2.y);
+  setColors(new color(255, 255, 255), new color(255, 255, 255), null);
+  ctx.beginPath();
+  ctx.arc(v1.x, v1.y, 20, 0, 2*Math.PI, false);
+  ctx.stroke();
+  ctx.fill();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.arc(v2.x, v2.y, 20, 0, 2*Math.PI, false);
+  ctx.stroke();
+  ctx.fill();
   var pp1 = axis.dotp(v1);
   var pp2 = axis.dotp(v1);
   if (pp1 > pp2)
@@ -109,10 +125,7 @@ function makeCircleProjection(circle, axis) {
 
 //calcola se due proiezioni si sovrappongono
 function overlaps(p1, p2) {
-  if (p1.max < p2.min || p1.min > p2.max)
-    return false;
-  else
-    return true;
+  return  (!(p1.max < p2.min || p1.min > p2.max));
 }
 
 //restituisce true se il punto è contenuto nella figura, false altrimenti
@@ -213,6 +226,10 @@ function drawLine(line) {
 function projection(min, max) {
   this.min = min;
   this.max = max;
+
+  this.print = function() {
+    console.log(min+" "+max);
+  }
 }
 
 function vector(a, b) {
@@ -231,6 +248,11 @@ function vector(a, b) {
 
   this.inverse = function() {
     return new vector(-this.a, -this.b);
+  }
+
+  this.normalize = function() {
+    var div = Math.sqrt(this.a * this.a + this.b * this.b);
+    return new vector(this.a/div, this.b/div);
   }
 }
 
