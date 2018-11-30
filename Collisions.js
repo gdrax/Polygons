@@ -44,6 +44,7 @@ function detectCircleShapeCollision(ball, shape) {
   var axes = getAxes(shape);
   for (var i=0; i<axes.length; i++) {
     var axis = axes[i];
+    drawLine(axis);
     var p1 = makeCircleProjection(ball, axis);
     var p2 = makeProjection(shape, axis);
     if (!overlaps(p1, p2)) {
@@ -53,6 +54,7 @@ function detectCircleShapeCollision(ball, shape) {
 
   var closestVertex = findClosestVertex(ball, shape);
   var axis = findCircleAxis(ball, closestVertex);
+  drawLine(axis);
   var p1 = makeCircleProjection(ball, axis);
   var p2 = makeProjection(shape, axis);
   if (!overlaps(p1, p2)) {
@@ -77,8 +79,7 @@ function getAxes(shape) {
 
 function findCircleAxis(ball, closestVertex) {
   var edge = closestVertex.subtract(ball.center);
-  var normal = edge.perp();
-  return normal;
+  return edge;
 }
 
 //calcola gli estremi della proiezione di una figura su una retta
@@ -96,9 +97,14 @@ function makeProjection(shape, axis) {
 }
 
 function makeCircleProjection(circle, axis) {
-  var min = axis.dotp(circle.center) + circle.radius;
-  var max = axis.dotp(circle.center) - circle.radius;
-  return new projection(min, max);
+  var v1 = translate(circle.center, circle.radius, axis);
+  var v2 = translate(circle.center, circle.radius, axis.inverse());
+  var pp1 = axis.dotp(v1);
+  var pp2 = axis.dotp(v1);
+  if (pp1 > pp2)
+    return new projection(pp2, pp1);
+  else
+    return new projection(pp1, pp2);
 }
 
 //calcola se due proiezioni si sovrappongono
@@ -180,6 +186,10 @@ function lineDistance(p, r) {
   }
 }
 
+function translate(p, magnitude, vector) {
+  return new point(p.x + vector.a * magnitude, p.y + vector.b * magnitude);
+}
+
 function findClosestVertex(ball, shape) {
   var minDistance = 2000;
   var closestVertex = null;
@@ -188,6 +198,14 @@ function findClosestVertex(ball, shape) {
       closestVertex = shape.vertices[i];
   }
   return closestVertex;
+}
+
+function drawLine(line) {
+  setColors(new color(255, 255, 255).makeColor(1), new color(255, 255, 255).makeColor(1), null)
+  ctx.beginPath();
+  ctx.moveTo(canvas.width/2, canvas.height/2);
+  ctx.lineTo(canvas.width/2 + line.a, canvas.height/2 + line.b);
+  ctx.stroke();
 }
 
 /*==============Oggetti==============*/
@@ -209,6 +227,10 @@ function vector(a, b) {
   //calcola il prodotto scalare
   this.dotp = function(p) {
     return this.a * p.x + this.b * p.y;
+  }
+
+  this.inverse = function() {
+    return new vector(-this.a, -this.b);
   }
 }
 
