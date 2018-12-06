@@ -1,19 +1,5 @@
-function detectBallCollision(ball, shape) {
-  /*for (var i=0; i<shape.vertices.length; i++) {
-    console.log(lineDistance(ball.center, lineToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) < ball.radius && beetweenY(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], ball.center))
-    if (lineDistance(ball.center, lineToPoints(shape.vertices[i], shape.vertices[(i + 1)%shape.vertices.length])) < ball.radius &&
-        beetweenY(shape.vertices[i], shape.vertices[(i+1)%shape.vertices.length], ball.center)) {
-      ball.vx = -ball.vx;
-      ball.vy = -ball.vy;
-    }
-  }*/
-  if (detectCircleShapeCollision(ball, shape))
-    ball.vx = -ball.vx;
-    ball.vy = -ball.vy;
-}
-
 /*
-Determina se due oggetti stanno collidendo o no
+Determina se due poligoni stanno collidendo o no
 */
 function detectCollision(s1, s2) {
   //genero assi per il primo oggetto
@@ -40,23 +26,24 @@ function detectCollision(s1, s2) {
   return true;
 }
 
+/*
+Determina se un cerchio e un poligono collidono
+*/
 function detectCircleShapeCollision(ball, shape) {
+  //genero gli assi per il poligono
   var axes = getAxes(shape);
   for (var i=0; i<axes.length; i++) {
     var axis = axes[i];
-    drawLine(axis);
     var p1 = makeCircleProjection(ball, axis);
     var p2 = makeProjection(shape, axis);
-    p1.print();
-    p2.print();
     if (!overlaps(p1, p2)) {
       return false;
     }
   }
 
+  //genero l'asse tra il centro del cerchio e il vertice più vicino ad esso del poligono
   var closestVertex = findClosestVertex(ball, shape);
   var axis = findCircleAxis(ball, closestVertex);
-  drawLine(axis);
   var p1 = makeCircleProjection(ball, axis);
   var p2 = makeProjection(shape, axis);
   if (!overlaps(p1, p2)) {
@@ -65,7 +52,9 @@ function detectCircleShapeCollision(ball, shape) {
   return true;
 }
 
-//restituisce gli assi di una figura
+/*
+Genera gli assi di un poligono
+*/
 function getAxes(shape) {
   var axes = [];
   for (var i=0; i<shape.vertices.length; i++) {
@@ -76,17 +65,25 @@ function getAxes(shape) {
     var normal = edge.perp();
     axes[i] = normal;
   }
+  //normalizzo gli assi
+  for (axis in axes) {
+    axis = axis.normalize();
+  }
   return axes;
 }
 
+/*
+Genera l'asse tra il centro del cerchio e il vertice del poligono più vicino
+*/
 function findCircleAxis(ball, closestVertex) {
   var edge = closestVertex.subtract(ball.center);
-  return edge;
+  return edge.normalize();
 }
 
-//calcola gli estremi della proiezione di una figura su una retta
-function makeProjection(shape, a) {
-  axis = a.normalize();
+/*
+Calcola gli estremi della proiezione di una figura su una retta
+*/
+function makeProjection(shape, axis) {
   var min = axis.dotp(shape.vertices[0]);
   var max = min;
   for (var i=1; i<shape.vertices.length; i++) {
@@ -99,36 +96,35 @@ function makeProjection(shape, a) {
   return new projection(min, max);
 }
 
-function makeCircleProjection(circle, a) {
-  axis = a.normalize();
-  //console.log(axis.a+"  "+axis.b);
-  var v1 = translate(circle.center, circle.radius, axis);
-  var v2 = translate(circle.center, circle.radius, axis.inverse());
-  //console.log("1: "+v1.x+", "+v1.y+"    2: "+v2.x+", "+v2.y);
-  setColors(new color(255, 255, 255), new color(255, 255, 255), null);
-  ctx.beginPath();
-  ctx.arc(v1.x, v1.y, 20, 0, 2*Math.PI, false);
-  ctx.stroke();
-  ctx.fill();
-  ctx.closePath();
-  ctx.beginPath();
-  ctx.arc(v2.x, v2.y, 20, 0, 2*Math.PI, false);
-  ctx.stroke();
-  ctx.fill();
-  var pp1 = axis.dotp(v1);
-  var pp2 = axis.dotp(v1);
-  if (pp1 > pp2)
-    return new projection(pp2, pp1);
-  else
-    return new projection(pp1, pp2);
+/*
+Calcola la proiezione di un cerchio su un asse
+*/
+function makeCircleProjection(circle, axis) {
+  var normal = axis.perp();
+  //trovo i punti del cerchio che corrispondono agli estremi della proiezione
+  var v1 = new point(circle.center.x + (-normal.b * circle.radius), circle.center.y + (normal.a * circle.radius));
+  var v2 = new point(circle.center.x + (normal.b * circle.radius), circle.center.y + (-normal.a * circle.radius));
+  //proietto i due punti sull'asse
+  var min = axis.dotp(v1);
+  var max = min;
+  var p = axis.dotp(v2);
+  if (p < min)
+    min = p;
+  if (p > max)
+    max = p;
+  return new projection(min, max);
 }
 
-//calcola se due proiezioni si sovrappongono
+/*
+Calcola se due proiezioni si sovrappongono
+*/
 function overlaps(p1, p2) {
   return  (!(p1.max < p2.min || p1.min > p2.max));
 }
 
-//restituisce true se il punto è contenuto nella figura, false altrimenti
+/*
+Restituisce true se il punto è contenuto nella figura, false altrimenti
+*/
 function contains(shape, point) {
   var cn = 0;
   //conto quanti lati incrociano il semiasse orizzontale che parte dal punto 'point'
@@ -143,7 +139,9 @@ function contains(shape, point) {
     return false;
 }
 
-//calcola se il semiasse orizzontale che parte da p incrocia il segmento v1-v2 (lato del poligono)
+/*
+Calcola se il semiasse orizzontale che parte da p incrocia il segmento v1-v2 (lato del poligono)
+*/
 function crossing(v1, v2, p) {
   //retta orizzontale, non si incrocia
   if (v1.y == v2.y)
@@ -169,7 +167,9 @@ function crossing(v1, v2, p) {
     return false;
 }
 
-//calcola se l'ordinata del punto p è compresa tra quelle dei vertici v1 e v2
+/*
+Calcola se l'ordinata del punto p è compresa tra quelle dei vertici v1 e v2
+*/
 function beetweenY(v1, v2, p) {
   if (p.y > Math.min(v1.y, v2.y) && p.y < Math.max(v1.y, v2.y))
     return true;
@@ -177,32 +177,9 @@ function beetweenY(v1, v2, p) {
     return false;
 }
 
-//calcola la distanza tra due punti
-function distance(p1, p2) {
-  return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
-}
-
-function lineToPoints(p1, p2) {
-  if (p1.x == p2.x)
-    //retta verticale
-    return new rect(null, p1.x);
-  else
-    return new rect((p1.y - p2.y)/(p1.x - p2.x), -p2.x*(p1.y - p2.y)/(p1.x - p2.x) + p2.y);
-}
-
-function lineDistance(p, r) {
-  if (r.m == null)
-    return distance(p, new point(r.q, p.y));
-  else {
-    r.generalEq();
-    return Math.abs(r.a*p.x + r.b*p.y + r.c)/Math.sqrt(r.a*r.a + r.b*r.b);
-  }
-}
-
-function translate(p, magnitude, vector) {
-  return new point(p.x + vector.a * magnitude, p.y + vector.b * magnitude);
-}
-
+/*
+Trova il vertice più vicino al centro del cerchio
+*/
 function findClosestVertex(ball, shape) {
   var minDistance = 2000;
   var closestVertex = null;
@@ -213,12 +190,11 @@ function findClosestVertex(ball, shape) {
   return closestVertex;
 }
 
-function drawLine(line) {
-  setColors(new color(255, 255, 255).makeColor(1), new color(255, 255, 255).makeColor(1), null)
-  ctx.beginPath();
-  ctx.moveTo(canvas.width/2, canvas.height/2);
-  ctx.lineTo(canvas.width/2 + line.a, canvas.height/2 + line.b);
-  ctx.stroke();
+/*
+Calcola la distanza tra due punti
+*/
+function distance(p1, p2) {
+  return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
 /*==============Oggetti==============*/
@@ -259,24 +235,4 @@ function vector(a, b) {
 function rect(m, q) {
   this.m = m;
   this.q = q;
-  this.a = null;
-  this.b = null;
-  this.c = null;
-
-  this.generalEq = function() {
-    this.a = -this.m;
-    this.b = 1;
-    this.c = -this.q;
-  }
-
-  this.computeMQ = function() {
-    if (b != 0) {
-      this.m = -this.a/this.b;
-      this.q = -this.c/this.b;
-    }
-    else {
-      this.m = null;
-      this.q = null;
-    }
-  }
 }
