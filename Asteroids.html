@@ -114,6 +114,7 @@
 					if (detectCircleShapeCollision(myBall, polygons[i])) {
 						myBall.vx = -myBall.vx;
 						myBall.vy = -myBall.vy;
+						applyBonus(myBall, polygons[i]);
 					}
 				}
 				break;
@@ -129,9 +130,9 @@
 				title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
 				clearPolygons();
 				polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5);
+																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5, 1, false);
 				polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5);
+																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5, 1, false);
 				break;
 			case "levels":
 				//aggiorno il nome del livello
@@ -140,14 +141,14 @@
 				clearPolygons();
 				for (var i=0; i<maxLevelsPolygons; i++)
 					polygons[i] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*2.5, Math.random()*1.5, Math.random());
+																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, Math.random()*2.5, Math.random()*1.5, Math.random(), 1, false);
 				levelName = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), currentLevel);
 				backButton = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 255), "Back");
 				levelRect = new roundRectangle(canvas.width*2/3, canvas.height*1/2, new color(255, 0, 255));
 				break;
 			case "playing":
 				clearPolygons();
-				polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0);
+				polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0, 1.5, true);
 				myBall = new ball(new point(canvas.width*5/6, canvas.height/4), 40, new color(255, 255, 255), new color(0, 255, 0), 4, 4);
 				break;
 		}

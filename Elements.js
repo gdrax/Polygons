@@ -199,7 +199,7 @@ function writingsRectangle(size, color, shadowColor, text) {
 /*
 Oggetto che rappresenta un poligono in movimeto
 */
-function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
+function polygon(sides, size, color, shadowColor, rv, vx, vy, angle, sB, dB) {
 	this.sides = sides;
 	this.size = size;
 	this.color = color.makeColor(1);
@@ -212,6 +212,8 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle) {
   this.vy = vy;
 	this.angle = angle;
   this.vertices = [];
+  this.speedBonus = sB;
+  this.doubleBall = dB;
 
 	this.draw = function(center, shadows) {
     setColors(this.color, this.shadowColor, null);
@@ -311,7 +313,6 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
       this.vy = -this.vy;
   }
 }
-
 
 /*
 Un punto con coordinate x y

@@ -97,14 +97,10 @@ function bouncePolygons() {
         break;
       }
     }
-  }/*
-  for (var i=0; i<polygons.length; i++) {
-    console.log("sargio	");
-    for (var j=i; j<polygons.length; j++) {
-      if(i!=j && detectCollision(polygons[i], polygons[j])) {
-        polygons[i].invertSpeed();
-        polygons[j].invertSpeed();
-      }
-    }
-  }*/
+  }
+}
+
+function applyBonus(ball, poly) {
+  ball.vx *= poly.speedBonus;
+  ball.vy *= poly.speedBonus;
 }
