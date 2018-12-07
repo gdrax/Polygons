@@ -217,8 +217,10 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle, sB, dB) {
 
 	this.draw = function(center, shadows) {
     setColors(this.color, this.shadowColor, null);
-	  if (shadows)
+	  if (shadows) {
 		  ctx.strokeStyle = this.shadowColor;
+      ctx.fillStyle = this.shadowColor;
+    }
 	  else
 		  ctx.strokeStyle = this.color;
 		ctx.beginPath();
@@ -303,14 +305,15 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
   this.move = function() {
     this.center.x += this.vx;
     this.center.y += this.vy;
+    this.vy += gravity;
   }
 
   this.borderBounce = function() {
     var nextCenter = new point(this.center.x + this.vx, this.center.y + this.vy);
     if (nextCenter.x + this.radius >= canvas.width || nextCenter.x - this.radius <= 0)
-      this.vx = -this.vx;
+      this.vx *= bounce;
     if (nextCenter.y + this.radius >= canvas.height || nextCenter.y - this.radius <= 0)
-      this.vy = -this.vy;
+      this.vy *= bounce;
   }
 }
 

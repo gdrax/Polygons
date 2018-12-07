@@ -16,7 +16,7 @@
 	}
 </style>
 <body>
-<canvas id="canvas" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)" onclick="mouseClick()"> </canvas>
+<canvas id="canvas" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()"> </canvas>
 <script type="text/javascript" src="./Utils.js"></script>
 <script type="text/javascript" src="./Collisions.js"></script>
 <script type="text/javascript" src="./Elements.js"></script>
@@ -43,6 +43,10 @@
 	var myBall = null;
 	var animation = null;
 	var backgroundColor = new color(10, 10, 10).makeColor(1);
+	var gravity = 0;
+	var bounce = -0.6;
+	var ballClicked = false;
+	var shotPoint = null;
 
 	clearArea();
 	//imposto primo stato di gioco
@@ -114,7 +118,7 @@
 					if (detectCircleShapeCollision(myBall, polygons[i])) {
 						myBall.vx = -myBall.vx;
 						myBall.vy = -myBall.vy;
-						applyBonus(myBall, polygons[i]);
+						//applyBonus(myBall, polygons[i]);
 					}
 				}
 				break;
@@ -149,7 +153,7 @@
 			case "playing":
 				clearPolygons();
 				polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0, 1.5, true);
-				myBall = new ball(new point(canvas.width*5/6, canvas.height/4), 40, new color(255, 255, 255), new color(0, 255, 0), 4, 4);
+				myBall = new ball(new point(canvas.width/2, canvas.height*9/10), 25, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 				break;
 		}
 	}
@@ -222,8 +226,21 @@
 				 	changeGameState("playing");
 				}
 				break;
-			case "playing":
-				break
+		}
+	}
+
+	function onMouseDown() {
+		if (gameState == "playing") {
+			if (mouseInCircle(myBall)) {
+				ballClicked = true;
+			}
+		}
+	}
+
+	function onMouseUp() {
+		if (gameState == "playing") {
+			ballClicked = false;
+			shotPoint = mousePoint;
 		}
 	}
 
