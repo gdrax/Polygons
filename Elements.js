@@ -132,9 +132,9 @@ function roundRectangle(width, height, shadowColor) {
 /*
 Oggetto che rappresenta un scritta circondata da un rettangolo
 */
-function writingsRectangle(size, color, shadowColor, text) {
+function writingsRectangle(size, strokeColor, shadowColor, text) {
   this.size = size;
-  this.color = color.makeColor(1);
+  this.strokeColor = strokeColor.makeColor(1);
   this.shadowColor = shadowColor.makeColor(1);
   this.text = text;
   this.radius = 10;
@@ -156,7 +156,7 @@ function writingsRectangle(size, color, shadowColor, text) {
       this.drawShadow(new point(this.wpoint.x-this.size/500, this.wpoint.y+this.size/500));
       this.drawRect(true);
     }
-    setColors(this.color, this.shadowColor, null);
+    setColors(this.strokeColor, this.shadowColor, null);
     ctx.strokeText(this.text, this.wpoint.x, this.wpoint.y);
     this.drawRect(false);
 
@@ -170,7 +170,7 @@ function writingsRectangle(size, color, shadowColor, text) {
 
   //disegna il rettangolo
   this.drawRect = function(shadows) {
-    setColors(this.color, this.shadowColor, null);
+    setColors(this.strokeColor, this.shadowColor, null);
     ctx.beginPath();
     ctx.moveTo(this.rpoint.x + this.radius, this.rpoint.y);
     ctx.lineTo(this.rpoint.x + this.width - this.radius, this.rpoint.y);
@@ -185,7 +185,7 @@ function writingsRectangle(size, color, shadowColor, text) {
     if (shadows)
       ctx.strokeStyle = this.shadowColor;
     else
-      ctx.strokeStyle = this.color;
+      ctx.strokeStyle = this.strokeColor;
     ctx.stroke();
   }
 
@@ -199,10 +199,10 @@ function writingsRectangle(size, color, shadowColor, text) {
 /*
 Oggetto che rappresenta un poligono in movimeto
 */
-function polygon(sides, size, color, shadowColor, rv, vx, vy, angle, sB, dB) {
+function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle, sB, dB) {
 	this.sides = sides;
 	this.size = size;
-	this.color = color.makeColor(1);
+	this.strokeColor = strokeColor.makeColor(1);
 	this.shadowColor = shadowColor.makeColor(1);
 	this.rotation = 0;
 	this.rv = rv;
@@ -216,13 +216,13 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle, sB, dB) {
   this.doubleBall = dB;
 
 	this.draw = function(center, shadows) {
-    setColors(this.color, this.shadowColor, null);
+    setColors(this.strokeColor, this.shadowColor, null);
 	  if (shadows) {
 		  ctx.strokeStyle = this.shadowColor;
       ctx.fillStyle = this.shadowColor;
     }
 	  else
-		  ctx.strokeStyle = this.color;
+		  ctx.strokeStyle = this.strokeColor;
 		ctx.beginPath();
 
 		ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
@@ -262,13 +262,14 @@ function polygon(sides, size, color, shadowColor, rv, vx, vy, angle, sB, dB) {
 /*
 Oggetto che modella un cerchio
 */
-function ball(center, radius, color, shadowColor, initialVx, initialVy) {
+function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
   this.center = center;
   this.radius = radius;
-  this.color = color.makeColor(1);
+  this.strokeColor = strokeColor.makeColor(1);
   this.shadowColor = shadowColor.makeColor(1);
   this.vx = initialVx;
   this.vy = initialVy;
+  this.line = false;
 
   this.angle = function() {
     return Math.atan2(this.vx, this.vy);
@@ -279,11 +280,11 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
   }
 
   this.draw = function(shadows) {
-    setColors(this.color, this.shadowColor, null);
+    setColors(this.strokeColor, this.shadowColor, null);
     if (shadows)
       ctx.strokeStyle = this.shadowColor;
     else
-      ctx.strokeStyle = this.color;
+      ctx.strokeStyle = this.strokeColor;
     ctx.beginPath();
     ctx.arc(this.center.x, this.center.y, this.radius, 0, 2*Math.PI, false);
     ctx.fill();
@@ -298,8 +299,13 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
     }
     this.radius = r;
     this.draw(false);
+    this.drawTargetLine();
     this.borderBounce();
     this.move();
+  }
+
+  this.drawTargetLine = function() {
+    drawLine(mousePoint, this.center, new color(255, 255, 255));
   }
 
   this.move = function() {
@@ -314,6 +320,11 @@ function ball(center, radius, color, shadowColor, initialVx, initialVy) {
       this.vx *= bounce;
     if (nextCenter.y + this.radius >= canvas.height || nextCenter.y - this.radius <= 0)
       this.vy *= bounce;
+  }
+
+  this.setSpeed = function(vx, vy) {
+    this.vx = vx;
+    this.vy = vy;
   }
 }
 

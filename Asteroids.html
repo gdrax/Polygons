@@ -16,7 +16,7 @@
 	}
 </style>
 <body>
-<canvas id="canvas" onmousemove="updateMouseCoordinates(event)" onkeypress="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()"> </canvas>
+<canvas id="canvas" onmousemove="mouseMove(event)" onkeypress="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()"> </canvas>
 <script type="text/javascript" src="./Utils.js"></script>
 <script type="text/javascript" src="./Collisions.js"></script>
 <script type="text/javascript" src="./Elements.js"></script>
@@ -229,19 +229,28 @@
 		}
 	}
 
-	function onMouseDown() {
+	function mouseDown() {
 		if (gameState == "playing") {
 			if (mouseInCircle(myBall)) {
 				ballClicked = true;
+				myBall.line = true;
 			}
 		}
 	}
 
-	function onMouseUp() {
+	function mouseUp() {
 		if (gameState == "playing") {
 			ballClicked = false;
 			shotPoint = mousePoint;
+			var d = distance(shotPoint, myBall.center)/4;
+			var m = -(shotPoint.y - myBall.center.y)/(shotPoint.x - myBall.center.x);
+			myBall.setSpeed(d*m, d);
+			myBall.line = false;
 		}
+	}
+
+	function mouseMove(event) {
+		updateMouseCoordinates(event);
 	}
 
 	function clearPolygons() {
