@@ -292,6 +292,8 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
   }
 
   this.drawWithLights = function() {
+    if (this.line)
+      this.drawTargetLine();
     var r = this.radius;
     if (mouseInCircle(this.center, this.radius)) {
       this.radius += 0.001;
@@ -299,8 +301,6 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
     }
     this.radius = r;
     this.draw(false);
-    if (this.line)
-      this.drawTargetLine();
     this.borderBounce();
     this.move();
   }
