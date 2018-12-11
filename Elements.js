@@ -299,7 +299,8 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
     }
     this.radius = r;
     this.draw(false);
-    this.drawTargetLine();
+    if (this.line)
+      this.drawTargetLine();
     this.borderBounce();
     this.move();
   }
