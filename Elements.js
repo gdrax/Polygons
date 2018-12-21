@@ -140,13 +140,14 @@ function writingsRectangle(size, strokeColor, shadowColor, text) {
   this.radius = 10;
   this.wpoint = null;
   this.rpoint = null;
-  this.width = ctx.measureText(text).width*5.3;
-  this.height = this.size*1.5;
-
+  //this.width = ctx.measureText(text).width*5.3;
+  this.width = ctx.measureText(text).width*5/3;
+  console.log(this.width);
+  this.height = size*1.5;
   //disegna il rettangolo con la scritta dentro
   this.draw = function(startingPoint, font) {
     this.wpoint = startingPoint;
-    this.rpoint = new point(startingPoint.x - this.width*3/25 , startingPoint.y - this.size);
+    this.rpoint = new point(startingPoint.x - this.width*3/25, startingPoint.y - this.size);
     setColors(null, null, null);
     ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
     ctx.font = this.size+"px "+font;
