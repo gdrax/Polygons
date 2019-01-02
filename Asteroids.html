@@ -261,7 +261,6 @@
 	}
 
 	function mouseDown() {
-		console.log("down");
 		if (gameState == "playing") {
 			if (mouseInCircle(myBall.center, myBall.radius)) {
 				ballClicked = true;
@@ -271,13 +270,12 @@
 	}
 
 	function mouseUp() {
-		console.log("up"+ballClicked);
 		if (gameState == "playing") {
 			if (ballClicked == true) {
 				shotPoint = mousePoint;
-				var d = distance(shotPoint, myBall.center)/4;
-				var m = -(shotPoint.y - myBall.center.y)/(shotPoint.x - myBall.center.x);
-				myBall.setSpeed(d*m, d);
+				var vx = shotPoint.x - myBall.center.x;
+				var vy = shotPoint.y - myBall.center.y;
+				myBall.setSpeed(-vx, -vy);
 				ballClicked = false;
 			}
 			myBall.line = false;
