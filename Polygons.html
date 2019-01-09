@@ -35,6 +35,8 @@
 	var title = null;	//titolo del gioco
 	var backButton = null;
 	var tryButton = null;
+	var choosePolygon = null;
+	var rectangleEditor = null;
 	var polygons = [];
 	var maxOpeningPolygons = 3;
 	var maxLevelsPolygons = 2;
@@ -99,8 +101,10 @@
 			case "editor":
 				backButton.setText("Back");
 				tryButton.setText("Try");
-				backButton.draw(new point(canvas.width*0.1, canvas.height/17), "Serif", false);
-				tryButton.draw(new point(canvas.width*0.8, canvas.height/17), "Serif", false);
+				backButton.draw(new point(canvas.width*0.05, canvas.height/16), "Serif", false);
+				tryButton.draw(new point(canvas.width*0.9, canvas.height/16), "Serif", false);
+				rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/10));
+				polygons[0].drawWithLights(new point(canvas.width/12, canvas.height*1/3));
 				break;
 			case "playing":
 				myBall.drawWithLights();
@@ -133,8 +137,11 @@
 																	new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5, 1, false);
 				break;
 			case "editor":
+			clearPolygons();
 				backButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Back");
 				tryButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Try");
+				rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
+				polygons[0] = new polygon(3, 30, new color(255, 255, 255), new color(255, 0, 255), 0, 0, 0, 0, 0, false);
 				break;
 			case "playing":
 				clearPolygons();
@@ -197,8 +204,11 @@
 				if (mouseInRectangle(backButton)) {
 					changeGameState("opening");
 				}
-				if (mouseInTriangle(tryButton)) {
+				if (mouseInRectangle(tryButton)) {
 					changeGameState("playing");
+				}
+				if (contains(polygons[0], mousePoint)) {
+					polygons[0].sides = ((polygons[0].sides - 1) % 3) + 3;
 				}
 			break;
 		}
