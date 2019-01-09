@@ -205,7 +205,7 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle, sB, d
 	this.size = size;
 	this.strokeColor = strokeColor.makeColor(1);
 	this.shadowColor = shadowColor.makeColor(1);
-	this.rotation = 0;
+	this.rotation = rv;
 	this.rv = rv;
 	this.translationX = 0;
   this.translationY = 0;
@@ -234,7 +234,6 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle, sB, d
 		ctx.stroke();
     //aggiorno rotazione e traslazione solo quando non disegno le ombre
     if (!shadows) {
-  		this.rotation = (this.rotation + this.rv) % (Math.PI * 2);
   		this.translationX += this.vx;
       this.translationY += this.vy;
     }
