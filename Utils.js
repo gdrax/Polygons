@@ -112,3 +112,10 @@ function drawLine(p1, p2, c) {
   ctx.lineTo(p2.x, p2.y);
   ctx.stroke();
 }
+
+function clonePolygon(p) {
+  var newP = new polygon(p.sides, p.size, new color(255, 255, 255), new color(255, 255, 255), p.rv, p.vx, p.vy, p.angle, p.speedBonus, p.doubleBall);
+  newP.strokeColor = p.strokeColor;
+  newP.shadowColor = p.shadowColor;
+  return newP;
+}

@@ -49,6 +49,7 @@
 	var ballClicked = false;
 	var shotPoint = null;
 	var dragging = false;
+	var draggingIndex = -1;
 	var placedPolygons = [];
 	var placedCenters = [];
 	var draggedPolygon = null;
@@ -253,8 +254,15 @@
 			for (var i=0; i<4; i++) {
 				if (contains(polygons[i], mousePoint)) {
 					dragging = true;
-					draggedPolygon = polygons[i];
+					draggedPolygon = clonePolygon(polygons[i]);
 					break;
+				}
+			}
+			for (var i=0; i<placedPolygons.length; i++) {
+				if (contains(placedPolygons[i], mousePoint)) {
+					dragging = true;
+					draggingIndex = i;
+					draggedPolygon = clonePolygon(polygons[i]);
 				}
 			}
 		}
@@ -275,9 +283,13 @@
 		if (gameState == "editor") {
 			if (dragging) {
 				if (mouseInRectangle(rectangleEditor)) {
-					placedPolygons[npp] = draggedPolygon;
-					placedCenters[npp] = mousePoint;
-					npp++;
+					if (draggingIndex == -1) {
+						placedPolygons[npp] = clonePolygon(draggedPolygon);
+						placedCenters[npp] = mousePoint;
+						npp++;
+					}
+					else
+						placedCenters[draggingIndex] = mousePoint;
 				}
 				else {
 					draggedPolygon = null;
