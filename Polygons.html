@@ -10,6 +10,9 @@
 
 		<canvas id="canvas" width="900" height="600" onmousemove="mouseMove(event)" onkeydown="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()">
 		</canvas>
+		<button class="startButton" id="startButton">
+			<div class="startText" id="startText">Start</div>
+		</button>
 		<script type="text/javascript" src="./Utils.js"></script>
 		<script type="text/javascript" src="./Collisions.js"></script>
 		<script type="text/javascript" src="./Elements.js"></script>
@@ -17,10 +20,20 @@
 			var canvas = document.getElementById("canvas");
 			var ctx = canvas.getContext("2d");
 			document.onkeydown = keyPressed;
+
+			var startButton = document.querySelector(".startButton");
+
+			startButton.addEventListener("click", function clickS(e) {
+				startButton.removeEventListener("click", clickS);
+				changeGameState("editor");
+				startButton.parentElement.removeChild(startButton);
+			})
+
+
+
 			var mousePoint = new point(0, 0); //conterrà la posizione del mouse
 			var gameState = null;	//stato del gioco
 			var keyPressed;
-			var title = null;	//titolo del gioco
 			var backButton = null;
 			var saveButton = null;
 			var choosePolygon = null;
@@ -100,10 +113,8 @@
 				clearArea();
 				switch (gameState) {
 					case "opening":
-						title.setText("Start");
 						polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
 						polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
-						title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
 						bouncePolygons();
 						break;
 
@@ -145,7 +156,6 @@
 			function initializeObjects() {
 				switch (gameState) {
 					case "opening":
-						title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
 						clearPolygons();
 						polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
 																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5, 1, false);
@@ -213,10 +223,6 @@
 			function mouseClick() {
 				switch(gameState) {
 					case "opening":
-						//con il click su "Start game" passo ai livelli
-						if (mouseInRectangle(title)) {
-							changeGameState("editor");
-						}
 					break;
 
 					case "editor":

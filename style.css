@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-body {
-    overflow: hidden;
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Questo toglie le scrollbar laterali */
 }
+
 .container {
   width: 900px;
   height: 600px;
   margin: auto;
   position: relative;
+}
+
+.startButton {
+  border-radius: 5px;
+  width: 200px;
+  height: 100px;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 45px;
+  font: Arial;
+  font-weight: 900;
+  color: #489124;
+  border-style: groove;
+  border-color: #489124;
+  background: #1E1E1E;
 }
