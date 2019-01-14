@@ -11,10 +11,7 @@
 			margin: 0px;
 			overflow: hidden;
 	}
-	canvas {
-		width: 100%;
-		height: 100%;
-	}
+
 </style>
 <body>
 <canvas id="canvas" onmousemove="mouseMove(event)" onkeydown="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()"> </canvas>
@@ -26,8 +23,8 @@
 	var ctx = canvas.getContext("2d");
 	document.onkeydown = keyPressed;
 
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	canvas.width = window.innerWidth*2/3;
+	canvas.height = window.innerHeight*2/3;
 
 	var mousePoint = new point(0, 0); //conterrà la posizione del mouse
 	var gameState = null;	//stato del gioco
@@ -57,8 +54,8 @@
 
 	//aggiorna la dimensioni dell'area
 	window.onresize = function resize() {
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
+		//canvas.width = window.innerWidth;
+	//	canvas.height = window.innerHeight;
 		//applica le modifiche
 		changeGameState(gameState);
 	}
