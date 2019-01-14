@@ -101,18 +101,10 @@
 			//imposto primo stato di gioco
 			changeGameState("opening");
 
-			/*aggiorna la dimensioni dell'area
-			window.onresize = function resize() {
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-				//applica le modifiche
-				changeGameState(gameState);
-			}*/
-
 			window.addEventListener('wheel', function(event) {
 				for (var i=0; i<placedPolygons.length; i++) {
 					if (contains(placedPolygons[i], mousePoint)) {
-						if (event.deltaY < 0) {
+						if (event.deltaY < 0 && placedPolygons[i].size >= 20) {
 							placedPolygons[i].size -= 5;
 							console.log("SCROLL SMALL");
 						}
@@ -124,9 +116,9 @@
 				}
 			});
 
-				/*
-				cambia lo stato del gioco
-				*/
+			/*
+			cambia lo stato del gioco
+			*/
 			function changeGameState(newState) {
 				if (gameState == null || newState != gameState) {
 					gameState = newState;
@@ -166,7 +158,6 @@
 						break;
 
 					case "editor":
-						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/10));
 						for (var i=0; i<4; i++) {
 							polygons[i].drawWithLights(new point(canvas.width/12, canvas.height*(3+i)/9));
 						}
@@ -175,6 +166,7 @@
 						for (var i=0; i<placedPolygons.length; i++) {
 							placedPolygons[i].drawWithLights(placedCenters[i]);
 						}
+						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/6));
 						break;
 					case "playing":
 						myBall.drawWithLights();

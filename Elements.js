@@ -33,7 +33,7 @@ function roundRectangle(width, height, shadowColor) {
   this.draw = function(point, shadows) {
     //pulisco l'area
     setColors(null, null, null);
-    ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
+    //ctx.fillRect(this.rpoint.x, this.rpoint.y, this.width, this.height);
 
     //disegno rettangolo
     ctx.beginPath();
