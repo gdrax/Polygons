@@ -13,6 +13,12 @@
 		<button class="startButton" id="startButton">
 			<div class="startText" id="startText">Start</div>
 		</button>
+		<button class="backButton" id="backButton">
+			<div class="backText" id="backText">Back</div>
+		</button>
+		<button class="tryButton" id="tryButton">
+			<div class="tryText" id="tryText">Try</div>
+		</button>
 		<script type="text/javascript" src="./Utils.js"></script>
 		<script type="text/javascript" src="./Collisions.js"></script>
 		<script type="text/javascript" src="./Elements.js"></script>
@@ -22,20 +28,55 @@
 			document.onkeydown = keyPressed;
 
 			var startButton = document.querySelector(".startButton");
-
-			startButton.addEventListener("click", function clickS(e) {
-				startButton.removeEventListener("click", clickS);
-				changeGameState("editor");
-				startButton.parentElement.removeChild(startButton);
-			})
+			var backButton = document.querySelector(".backButton");
+			var tryButton = document.querySelector(".tryButton");
+			hideButtons("editor");
 
 
+			function hideButtons(gameState) {
+				if (gameState == "opening")
+					startButton.style.display='none';
+				if (gameState =="editor") {
+					backButton.style.display='none';
+					tryButton.style.display='none';
+				}
+			}
+
+			function showButtons(gameState) {
+				if (gameState == "opening")
+					startButton.style.display='block';
+				if (gameState =="editor") {
+					backButton.style.display='block';
+					tryButton.style.display='block';
+				}
+			}
+
+			function setStartListener() {
+				startButton.addEventListener("click", function clickS(e) {
+					startButton.removeEventListener("click", clickS);
+					hideButtons("opening");
+					showButtons("editor");
+					changeGameState("editor");
+				});
+			};
+
+			function setEditorListeners() {
+				backButton.addEventListener("click", function clickB(e) {
+					backButton.removeEventListener("click", clickB);
+					hideButtons("editor");
+					showButtons("opening");
+					changeGameState("opening");
+				});
+				tryButton.addEventListener("click", function clickT(e) {
+					tryButton.removeEventListener("click", clickT);
+					hideButtons("editor");
+					changeGameState("playing");
+				});
+			};
 
 			var mousePoint = new point(0, 0); //conterrà la posizione del mouse
 			var gameState = null;	//stato del gioco
 			var keyPressed;
-			var backButton = null;
-			var saveButton = null;
 			var choosePolygon = null;
 			var rectangleEditor = null;
 			var polygons = [];
@@ -91,6 +132,12 @@
 					gameState = newState;
 					//inizializza gli oggetti
 					initializeObjects();
+					if (gameState == "opening") {
+						setStartListener();
+					}
+					if (gameState == "editor") {
+						setEditorListeners();
+					}
 				}
 				//disegna gli oggetti
 				startAnimation();
@@ -119,10 +166,6 @@
 						break;
 
 					case "editor":
-						backButton.setText("Back");
-						saveButton.setText("Save");
-						backButton.draw(new point(canvas.width*0.05, canvas.height/16), "Serif", false);
-						saveButton.draw(new point(canvas.width*0.9, canvas.height/16), "Serif", false);
 						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/10));
 						for (var i=0; i<4; i++) {
 							polygons[i].drawWithLights(new point(canvas.width/12, canvas.height*(3+i)/9));
@@ -164,8 +207,6 @@
 						break;
 					case "editor":
 					clearPolygons();
-						backButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Back");
-						saveButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Save");
 						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
 						for (var i=0; i<4; i++) {
 							polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0, 0, false);
@@ -226,12 +267,6 @@
 					break;
 
 					case "editor":
-						if (mouseInRectangle(backButton)) {
-							changeGameState("opening");
-						}
-						if (mouseInRectangle(saveButton)) {
-							changeGameState("playing");
-						}
 					break;
 				}
 			}

@@ -29,3 +29,37 @@ html, body {
   border-color: #489124;
   background: #1E1E1E;
 }
+
+.backButton {
+  border-radius: 5px;
+  width: 150px;
+  height: 60px;
+  margin: auto;
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  font-size: 45px;
+  font: Arial;
+  font-weight: 900;
+  color: #489124;
+  border-style: groove;
+  border-color: #489124;
+  background: #1E1E1E;
+}
+
+.tryButton {
+  border-radius: 5px;
+  width: 150px;
+  height: 60px;
+  margin: auto;
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  font-size: 45px;
+  font: Arial;
+  font-weight: 900;
+  color: #489124;
+  border-style: groove;
+  border-color: #489124;
+  background: #1E1E1E;
+}
