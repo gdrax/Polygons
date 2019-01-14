@@ -1,16 +1,10 @@
-html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0px;
+<!DOCTYPE html>
+body {
     overflow: hidden;
-    text-align: center;
 }
 .container {
   width: 900px;
   height: 600px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  down: 0;
-  bottom: 0;
+  margin: auto;
+  position: relative;
 }

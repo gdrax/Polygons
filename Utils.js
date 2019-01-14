@@ -119,3 +119,15 @@ function clonePolygon(p) {
   newP.shadowColor = p.shadowColor;
   return newP;
 }
+
+function findRelativeCoordinates(x, y) {
+  var offsetX = x;
+  var offsetY = y;
+  var ele = canvas;
+  while (ele) {
+    offsetX -= ele.offsetLeft;
+    offsetX -= ele.offsetTop;
+    ele = ele.offsetParent;
+  }
+  return new point(offsetX, offsetY);
+}

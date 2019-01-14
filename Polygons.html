@@ -8,294 +8,294 @@
 <body>
 	<div class="container" style="background-color: #333333">
 
-	<canvas id="canvas" width="900" height="600" onmousemove="mouseMove(event)" onkeydown="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()">
-	</canvas>
-	<script type="text/javascript" src="./Utils.js"></script>
-	<script type="text/javascript" src="./Collisions.js"></script>
-	<script type="text/javascript" src="./Elements.js"></script>
-	<script type="text/javascript">
-		var canvas = document.getElementById("canvas");
-		var ctx = canvas.getContext("2d");
-		document.onkeydown = keyPressed;
+		<canvas id="canvas" width="900" height="600" onmousemove="mouseMove(event)" onkeydown="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()">
+		</canvas>
+		<script type="text/javascript" src="./Utils.js"></script>
+		<script type="text/javascript" src="./Collisions.js"></script>
+		<script type="text/javascript" src="./Elements.js"></script>
+		<script type="text/javascript">
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext("2d");
+			document.onkeydown = keyPressed;
+			var mousePoint = new point(0, 0); //conterrà la posizione del mouse
+			var gameState = null;	//stato del gioco
+			var keyPressed;
+			var title = null;	//titolo del gioco
+			var backButton = null;
+			var saveButton = null;
+			var choosePolygon = null;
+			var rectangleEditor = null;
+			var polygons = [];
+			var maxOpeningPolygons = 3;
+			var maxLevelsPolygons = 2;
+			var myBall = null;
+			var animation = null;
+			var backgroundColor = new color(30, 30, 30).makeColor(1);
+			var backgroundColor2 = new color(10, 10, 10).makeColor(1);
+			var gravity = 0;
+			var bounce = -0.6;
+			var ballClicked = false;
+			var shotPoint = null;
+			var dragging = false;
+			var draggingIndex = -1;
+			var placedPolygons = [];
+			var placedCenters = [];
+			var draggedPolygon = null;
+			var npp = 0;
 
-		var mousePoint = new point(0, 0); //conterrà la posizione del mouse
-		var gameState = null;	//stato del gioco
-		var keyPressed;
-		var title = null;	//titolo del gioco
-		var backButton = null;
-		var saveButton = null;
-		var choosePolygon = null;
-		var rectangleEditor = null;
-		var polygons = [];
-		var maxOpeningPolygons = 3;
-		var maxLevelsPolygons = 2;
-		var myBall = null;
-		var animation = null;
-		var backgroundColor = new color(30, 30, 30).makeColor(1);
-		var backgroundColor2 = new color(10, 10, 10).makeColor(1);
-		var gravity = 0;
-		var bounce = -0.6;
-		var ballClicked = false;
-		var shotPoint = null;
-		var dragging = false;
-		var draggingIndex = -1;
-		var placedPolygons = [];
-		var placedCenters = [];
-		var draggedPolygon = null;
-		var npp = 0;
-
-		clearArea();
-		//imposto primo stato di gioco
-		changeGameState("opening");
-
-		/*aggiorna la dimensioni dell'area
-		window.onresize = function resize() {
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			//applica le modifiche
-			changeGameState(gameState);
-		}*/
-
-		window.addEventListener('wheel', function(event) {
-			for (var i=0; i<placedPolygons.length; i++) {
-				if (contains(placedPolygons[i], mousePoint)) {
-					if (event.deltaY < 0) {
-						placedPolygons[i].size -= 5;
-						console.log("SCROLL SMALL");
-					}
-					if (event.deltaY > 0) {
-						placedPolygons[i].size += 5;
-						console.log("SCROLL BIG");
-					}
-				}
-			}
-		});
-
-		/*
-		cambia lo stato del gioco
-		*/
-		function changeGameState(newState) {
-			if (gameState == null || newState != gameState) {
-				gameState = newState;
-				//inizializza gli oggetti
-				initializeObjects();
-			}
-			//disegna gli oggetti
-			startAnimation();
-		}
-
-		/*
-		pulisce l'area di gioco
-		*/
-		function clearArea() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.fillStyle = backgroundColor2;
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-		}
-
-		/*
-		disegna l'area e gli elementi di gioco
-		*/
-		function drawArea() {
-			//pulisco l'area
 			clearArea();
-			switch (gameState) {
-				case "opening":
-					title.setText("Start");
-					polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
-					polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
-					title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
-					bouncePolygons();
-					break;
+			//imposto primo stato di gioco
+			changeGameState("opening");
 
-				case "editor":
-					backButton.setText("Back");
-					saveButton.setText("Save");
-					backButton.draw(new point(canvas.width*0.05, canvas.height/16), "Serif", false);
-					saveButton.draw(new point(canvas.width*0.9, canvas.height/16), "Serif", false);
-					rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/10));
-					for (var i=0; i<4; i++) {
-						polygons[i].drawWithLights(new point(canvas.width/12, canvas.height*(3+i)/9));
-					}
-					if (dragging)
-						draggedPolygon.drawWithLights(mousePoint);
-					for (var i=0; i<placedPolygons.length; i++) {
-						placedPolygons[i].drawWithLights(placedCenters[i]);
-					}
-					break;
-				case "playing":
-					myBall.drawWithLights();
-					polygons[0].drawWithLights(new point(canvas.width*8/9, canvas.height/2));
-					polygons[1].drawWithLights(new point(canvas.width*2/9, canvas.height/3));
+			/*aggiorna la dimensioni dell'area
+			window.onresize = function resize() {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				//applica le modifiche
+				changeGameState(gameState);
+			}*/
 
-					for (var i=0; i<polygons.length; i++) {
-						console.log(detectCircleShapeCollision(myBall, polygons[i]));
-						if (detectCircleShapeCollision(myBall, polygons[i])) {
-							myBall.vx = -myBall.vx;
-							myBall.vy = -myBall.vy;
-							//applyBonus(myBall, polygons[i]);
-						}
-					}
-					break;
-			}
-		}
-
-		/*
-		inizializza gli oggetti
-		*/
-		function initializeObjects() {
-			switch (gameState) {
-				case "opening":
-					title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
-					clearPolygons();
-					polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5, 1, false);
-					polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																		new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5, 1, false);
-					break;
-				case "editor":
-				clearPolygons();
-					backButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Back");
-					saveButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Save");
-					rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
-					for (var i=0; i<4; i++) {
-						polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0, 0, false);
-					}
-					break;
-				case "playing":
-					clearPolygons();
-					polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0, 1.5, true);
-					polygons[1] = new polygon(6, 50, new color(255, 255, 255), new color(255, 0, 0), 0, 0, 0, 0, 1.5, true);
-					myBall = new ball(new point(canvas.width/2, canvas.height*9/10), 25, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
-					break;
-			}
-		}
-
-		/*
-		avvia le animazioni
-		*/
-		function startAnimation() {
-			clearInterval(animation);
-			switch (gameState) {
-				case "opening":
-					animation = setInterval(drawArea, 10);
-					break;
-				case "editor":
-					animation = setInterval(drawArea, 20);
-					break;
-				case "playing":
-					animation = setInterval(drawArea, 20);
-	 				break;
-			}
-		}
-
-		/*
-		salva l'ultimo tasto premuto
-		*/
-		function keyPressed(event) {
-			key = event.keyCode;
-			if (gameState == "opening") {
-				if (key == 13)
-					changeGameState("editor");
-			}
-		}
-
-		/*
-		aggiorna la posizione del muose quando si muove
-		*/
-		function updateMouseCoordinates(event) {
-			mousePoint = new point(event.clientX, event.clientY);
-		}
-
-		/*
-		Gestisce l'evento mouseClick
-		*/
-		function mouseClick() {
-			switch(gameState) {
-				case "opening":
-					//con il click su "Start game" passo ai livelli
-					if (mouseInRectangle(title)) {
-						changeGameState("editor");
-					}
-				break;
-
-				case "editor":
-					if (mouseInRectangle(backButton)) {
-						changeGameState("opening");
-					}
-					if (mouseInRectangle(saveButton)) {
-						changeGameState("playing");
-					}
-				break;
-			}
-		}
-
-		function mouseDown() {
-			if (gameState == "playing") {
-				if (mouseInCircle(myBall.center, myBall.radius)) {
-					ballClicked = true;
-				}
-				myBall.line = true;
-			}
-			if (gameState == "editor") {
-				for (var i=0; i<4; i++) {
-					if (contains(polygons[i], mousePoint)) {
-						dragging = true;
-						draggingIndex = -1;
-						draggedPolygon = clonePolygon(polygons[i]);
-						break;
-					}
-				}
+			window.addEventListener('wheel', function(event) {
 				for (var i=0; i<placedPolygons.length; i++) {
 					if (contains(placedPolygons[i], mousePoint)) {
-						dragging = true;
-						draggingIndex = i;
-						draggedPolygon = clonePolygon(placedPolygons[i]);
-					}
-				}
-			}
-		}
-
-		function mouseUp() {
-			if (gameState == "playing") {
-				if (ballClicked == true) {
-					shotPoint = mousePoint;
-					var vx = shotPoint.x - myBall.center.x;
-					var vy = shotPoint.y - myBall.center.y;
-					myBall.setSpeed(-vx/2, -vy/2);
-					ballClicked = false;
-					gravity = 1;
-				}
-				myBall.line = false;
-			}
-			if (gameState == "editor") {
-				if (dragging) {
-					if (mouseInRectangle(rectangleEditor)) {
-						if (draggingIndex == -1) {
-							placedPolygons[npp] = clonePolygon(draggedPolygon);
-							placedCenters[npp] = mousePoint;
-							npp++;
+						if (event.deltaY < 0) {
+							placedPolygons[i].size -= 5;
+							console.log("SCROLL SMALL");
 						}
-						else
-							placedCenters[draggingIndex] = mousePoint;
+						if (event.deltaY > 0) {
+							placedPolygons[i].size += 5;
+							console.log("SCROLL BIG");
+						}
 					}
-					else {
-						draggedPolygon = null;
-					}
-					dragging = false;
+				}
+			});
+
+				/*
+				cambia lo stato del gioco
+				*/
+			function changeGameState(newState) {
+				if (gameState == null || newState != gameState) {
+					gameState = newState;
+					//inizializza gli oggetti
+					initializeObjects();
+				}
+				//disegna gli oggetti
+				startAnimation();
+				}
+
+			/*
+			pulisce l'area di gioco
+			*/
+			function clearArea() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.fillStyle = backgroundColor2;
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+			}
+
+			/*
+			disegna l'area e gli elementi di gioco
+			*/
+			function drawArea() {
+				//pulisco l'area
+				clearArea();
+				switch (gameState) {
+					case "opening":
+						title.setText("Start");
+						polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
+						polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
+						title.draw(new point(canvas.width*7/16, canvas.height/2), "Serif", false);
+						bouncePolygons();
+						break;
+
+					case "editor":
+						backButton.setText("Back");
+						saveButton.setText("Save");
+						backButton.draw(new point(canvas.width*0.05, canvas.height/16), "Serif", false);
+						saveButton.draw(new point(canvas.width*0.9, canvas.height/16), "Serif", false);
+						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/10));
+						for (var i=0; i<4; i++) {
+							polygons[i].drawWithLights(new point(canvas.width/12, canvas.height*(3+i)/9));
+						}
+						if (dragging)
+							draggedPolygon.drawWithLights(mousePoint);
+						for (var i=0; i<placedPolygons.length; i++) {
+							placedPolygons[i].drawWithLights(placedCenters[i]);
+						}
+						break;
+					case "playing":
+						myBall.drawWithLights();
+						polygons[0].drawWithLights(new point(canvas.width*8/9, canvas.height/2));
+						polygons[1].drawWithLights(new point(canvas.width*2/9, canvas.height/3));
+
+						for (var i=0; i<polygons.length; i++) {
+							console.log(detectCircleShapeCollision(myBall, polygons[i]));
+							if (detectCircleShapeCollision(myBall, polygons[i])) {
+								myBall.vx = -myBall.vx;
+								myBall.vy = -myBall.vy;
+								//applyBonus(myBall, polygons[i]);
+							}
+						}
+						break;
 				}
 			}
-		}
 
-		function mouseMove(event) {
-			updateMouseCoordinates(event);
-		}
+			/*
+			inizializza gli oggetti
+			*/
+			function initializeObjects() {
+				switch (gameState) {
+					case "opening":
+						title = new writingsRectangle(canvas.height/20, new color(255, 255, 255), new color(0, 255, 0), "Start game");
+						clearPolygons();
+						polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
+																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5, 1, false);
+						polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
+																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5, 1, false);
+						break;
+					case "editor":
+					clearPolygons();
+						backButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Back");
+						saveButton = new writingsRectangle(canvas.height/17, new color(255, 255, 255), new color(255, 0, 0), "Save");
+						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
+						for (var i=0; i<4; i++) {
+							polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0, 0, false);
+						}
+						break;
+					case "playing":
+						clearPolygons();
+						polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0, 1.5, true);
+						polygons[1] = new polygon(6, 50, new color(255, 255, 255), new color(255, 0, 0), 0, 0, 0, 0, 1.5, true);
+						myBall = new ball(new point(canvas.width/2, canvas.height*9/10), 25, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
+						break;
+				}
+			}
 
-		function clearPolygons() {
-			polygons = null;
-			polygons = [];
-		}
-	</script>
+			/*
+			avvia le animazioni
+			*/
+			function startAnimation() {
+				clearInterval(animation);
+				switch (gameState) {
+					case "opening":
+						animation = setInterval(drawArea, 10);
+						break;
+					case "editor":
+						animation = setInterval(drawArea, 20);
+						break;
+					case "playing":
+						animation = setInterval(drawArea, 20);
+		 				break;
+				}
+			}
+
+			/*
+			salva l'ultimo tasto premuto
+			*/
+			function keyPressed(event) {
+				key = event.keyCode;
+				if (gameState == "opening") {
+					if (key == 13)
+						changeGameState("editor");
+				}
+			}
+
+			/*
+			aggiorna la posizione del muose quando si muove
+			*/
+			function updateMouseCoordinates(event) {
+				console.log(event.clientX, event.clientY);
+				mousePoint = findRelativeCoordinates(event.clientX, event.clientY);
+			}
+
+			/*
+			Gestisce l'evento mouseClick
+			*/
+			function mouseClick() {
+				switch(gameState) {
+					case "opening":
+						//con il click su "Start game" passo ai livelli
+						if (mouseInRectangle(title)) {
+							changeGameState("editor");
+						}
+					break;
+
+					case "editor":
+						if (mouseInRectangle(backButton)) {
+							changeGameState("opening");
+						}
+						if (mouseInRectangle(saveButton)) {
+							changeGameState("playing");
+						}
+					break;
+				}
+			}
+
+			function mouseDown() {
+				if (gameState == "playing") {
+					if (mouseInCircle(myBall.center, myBall.radius)) {
+						ballClicked = true;
+					}
+					myBall.line = true;
+				}
+				if (gameState == "editor") {
+					for (var i=0; i<4; i++) {
+						if (contains(polygons[i], mousePoint)) {
+							dragging = true;
+							draggingIndex = -1;
+							draggedPolygon = clonePolygon(polygons[i]);
+							break;
+						}
+					}
+					for (var i=0; i<placedPolygons.length; i++) {
+						if (contains(placedPolygons[i], mousePoint)) {
+							dragging = true;
+							draggingIndex = i;
+							draggedPolygon = clonePolygon(placedPolygons[i]);
+						}
+					}
+				}
+			}
+
+			function mouseUp() {
+				if (gameState == "playing") {
+					if (ballClicked == true) {
+						shotPoint = mousePoint;
+						var vx = shotPoint.x - myBall.center.x;
+						var vy = shotPoint.y - myBall.center.y;
+						myBall.setSpeed(-vx/2, -vy/2);
+						ballClicked = false;
+						gravity = 1;
+					}
+					myBall.line = false;
+				}
+				if (gameState == "editor") {
+					if (dragging) {
+						if (mouseInRectangle(rectangleEditor)) {
+							if (draggingIndex == -1) {
+								placedPolygons[npp] = clonePolygon(draggedPolygon);
+								placedCenters[npp] = mousePoint;
+								npp++;
+							}
+							else
+								placedCenters[draggingIndex] = mousePoint;
+						}
+						else {
+							draggedPolygon = null;
+						}
+						dragging = false;
+					}
+				}
+			}
+
+			function mouseMove(event) {
+				updateMouseCoordinates(event);
+			}
+
+			function clearPolygons() {
+				polygons = null;
+				polygons = [];
+			}
+		</script>
 	</div>
 </body>
 </html>
