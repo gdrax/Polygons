@@ -130,6 +130,16 @@
 					if (gameState == "editor") {
 						setEditorListeners();
 					}
+					if (gameState == "playing") {
+						for (var i=0; i<placedPolygons.length; i++) {
+							if (placedPolygons[i] != null) {
+								console.log(placedCenters[i]);
+								placedCenters[i].x *= 3/2;
+								placedCenters[i].y *= 3/2;
+								placedPolygons[i].size *= 3/2;
+							}
+						}
+					}
 				}
 				//disegna gli oggetti
 				startAnimation();
@@ -170,17 +180,12 @@
 						}
 						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/6));
 						break;
-					case "playing":
-						myBall.drawWithLights();
-						polygons[0].drawWithLights(new point(canvas.width*8/9, canvas.height/2));
-						polygons[1].drawWithLights(new point(canvas.width*2/9, canvas.height/3));
 
-						for (var i=0; i<polygons.length; i++) {
-							console.log(detectCircleShapeCollision(myBall, polygons[i]));
-							if (detectCircleShapeCollision(myBall, polygons[i])) {
-								myBall.vx = -myBall.vx;
-								myBall.vy = -myBall.vy;
-								//applyBonus(myBall, polygons[i]);
+					case "playing":
+						for (var i=0; i<placedPolygons.length; i++) {
+							if (placedPolygons[i] != null) {
+								console.log("HERE");
+								placedPolygons[i].drawWithLights(placedCenters[i]);
 							}
 						}
 						break;
@@ -200,7 +205,7 @@
 																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5, 1, false);
 						break;
 					case "editor":
-					clearPolygons();
+						clearPolygons();
 						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
 						for (var i=0; i<4; i++) {
 							polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0, 0, false);
@@ -209,9 +214,6 @@
 						break;
 					case "playing":
 						clearPolygons();
-						polygons[0] = new polygon(6, 60, new color(255, 255, 255), new color(200-20, 0+10, 255), 0, 0, 0, 0, 1.5, true);
-						polygons[1] = new polygon(6, 50, new color(255, 255, 255), new color(255, 0, 0), 0, 0, 0, 0, 1.5, true);
-						myBall = new ball(new point(canvas.width/2, canvas.height*9/10), 25, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						break;
 				}
 			}
@@ -223,7 +225,7 @@
 				clearInterval(animation);
 				switch (gameState) {
 					case "opening":
-						animation = setInterval(drawArea, 10);
+						animation = setInterval(drawArea, 20);
 						break;
 					case "editor":
 						animation = setInterval(drawArea, 20);
@@ -233,23 +235,22 @@
 		 				break;
 				}
 			}
-
+/*
 			/*
 			salva l'ultimo tasto premuto
-			*/
+
 			function keyPressed(event) {
 				key = event.keyCode;
 				if (gameState == "opening") {
 					if (key == 13)
 						changeGameState("editor");
 				}
-			}
+			}*/
 
 			/*
 			aggiorna la posizione del muose quando si muove
 			*/
 			function updateMouseCoordinates(event) {
-				console.log(event.clientX, event.clientY);
 				mousePoint = findRelativeCoordinates(event.clientX, event.clientY);
 			}
 
