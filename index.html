@@ -199,6 +199,15 @@
 								placedPolygons[i].drawWithLights(placedCenters[i]);
 							}
 						}
+						myBall.drawWithLights();
+						for (var i=0; i<placedPolygons.length; i++) {
+							if (placedPolygons[i] != null) {
+								if (detectCircleShapeCollision(myBall, placedPolygons[i])) {
+									myBall.vx = -myBall.vx;
+									myBall.vy = -myBall.vy;
+								}
+							}
+						}
 						break;
 				}
 			}
