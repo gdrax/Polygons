@@ -245,8 +245,8 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
     this.center.x += this.vx;
     this.center.y += this.vy;
     this.vy += gravity;
-    this.vx *= 0.99;
-    this.vy *= 0.99;
+    //this.vx *= 0.99;
+    //this.vy *= 0.99;
   }
 
   this.borderBounce = function() {
