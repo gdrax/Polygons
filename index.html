@@ -121,6 +121,7 @@
 			*/
 			function changeGameState(newState) {
 				if (gameState == null || newState != gameState) {
+					var oldState = gameState;
 					gameState = newState;
 					//inizializza gli oggetti
 					initializeObjects();
@@ -128,14 +129,23 @@
 						setStartListener();
 					}
 					if (gameState == "editor") {
+						if (oldState == "playing") {
+							for (var i=0; i<placedPolygons.length; i++) {
+								if (placedPolygons[i] != null) {
+									placedCenters[i].x = placedCenters[i].x*2/3 + canvas.width/6;
+									placedCenters[i].y = placedCenters[i].y*2/3 + canvas.height/6;
+									placedPolygons[i].size *= 2/3;
+								}
+							}
+						}
 						setEditorListeners();
+						showButtons("editor");
 					}
 					if (gameState == "playing") {
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								console.log(placedCenters[i]);
-								placedCenters[i].x = (placedCenters[i].x - rectangleEditor.rpoint.x)*3/2;
-								placedCenters[i].y = (placedCenters[i].y - rectangleEditor.rpoint.y)*3/2;
+								placedCenters[i].x = (placedCenters[i].x - canvas.width/6)*3/2;
+								placedCenters[i].y = (placedCenters[i].y - canvas.height/6)*3/2;
 								placedPolygons[i].size *= 3/2;
 							}
 						}
@@ -184,7 +194,6 @@
 					case "playing":
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								console.log("HERE");
 								placedPolygons[i].drawWithLights(placedCenters[i]);
 							}
 						}
@@ -235,17 +244,19 @@
 		 				break;
 				}
 			}
-/*
+
 			/*
 			salva l'ultimo tasto premuto
-
+			*/
 			function keyPressed(event) {
 				key = event.keyCode;
-				if (gameState == "opening") {
-					if (key == 13)
+				if (gameState == "playing") {
+					if (key == 27) {
+						setEditorListeners();
 						changeGameState("editor");
+					}
 				}
-			}*/
+			}
 
 			/*
 			aggiorna la posizione del muose quando si muove
