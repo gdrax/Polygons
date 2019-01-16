@@ -199,7 +199,7 @@
 						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								if (detectCircleShapeCollision(myBall, placedPolygons[i])) {
+								if (detectCircleShapeCollision2(myBall, placedPolygons[i])) {
 									myBall.vx = -myBall.vx;
 									myBall.vy = -myBall.vy;
 								}
@@ -279,7 +279,7 @@
 			function mouseClick() {
 				switch(gameState) {
 					case "editor":
-					 for(var i=0; i<placedPolygons[i].length; i++) {
+					 for(var i=0; i<placedPolygons.length; i++) {
 						 if (contains(placedPolygons[i], mousePoint)) {
 							 choosedPolygon = clonePolygon(placedPolygons[i]);
 						 }
