@@ -27,44 +27,27 @@ function detectCollision(s1, s2) {
 }
 
 /*
-Determina se un cerchio e un poligono collidono
+Determina se un cerchio e un poligono stanno collidendo
 */
-function detectCircleShapeCollision(circle, shape) {
-  //genero gli assi per il poligono
-  var axes = getAxes(shape);
-  for (var i=0; i<axes.length; i++) {
-    var axis = axes[i];
-    var p1 = makeCircleProjection(circle, axis);
-    var p2 = makeProjection(shape, axis);
-    if (!overlaps(p1, p2)) {
-      return false;
-    }
-  }
-
-  //genero l'asse tra il centro del cerchio e il vertice più vicino ad esso del poligono
-  var closestVertex = findClosestVertex(circle, shape);
-  var axis = findCircleAxis(circle, closestVertex);
-  var p1 = makeCircleProjection(circle, axis);
-  var p2 = makeProjection(shape, axis);
-  if (!overlaps(p1, p2)) {
-    return false;
-  }
-  return true;
-}
-
 function detectCircleShapeCollision2(circle, shape) {
+  //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
     var v1 = shape.vertices[i];
     var v2 = shape.vertices[(i+1)%shape.vertices.length];
+    //calcolo il vettore su cui si trova il lato, e lo normalizzo
     var edge = v1.subtract(v2).normalize();
+    //calcolo il vettore con il centro del cerchio
     var cirlceVect = v1.subtract(circle.center);
     var length = distance(v1, v2);
+    //calcolo il prodotto scalare
     var dot = edge.dotp(cirlceVect)/length;
+    //trovo le coordinate della proiezione del centro sul vettore
     var cpoint = new point(v1.x + dot *(v2.x - v1.x), v1.y + dot * (v2.y - v1.y));
     //var showP = new ball(cpoint, 10, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
     if (!betweenX(v1, v2, cpoint) || !betweenY(v1, v2, cpoint))
       continue;
     if (distance(cpoint, circle.center) < circle.radius)
+      //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
       return true;
     else
       continue;
@@ -93,14 +76,6 @@ function getAxes(shape) {
 }
 
 /*
-Genera l'asse tra il centro del cerchio e il vertice del poligono più vicino
-*/
-function findCircleAxis(circle, closestVertex) {
-  var edge = closestVertex.subtract(circle.center);
-  return edge.normalize();
-}
-
-/*
 Calcola gli estremi della proiezione di una figura su una retta
 */
 function makeProjection(shape, axis) {
@@ -113,25 +88,6 @@ function makeProjection(shape, axis) {
     if (p > max)
       max = p;
   }
-  return new projection(min, max);
-}
-
-/*
-Calcola la proiezione di un cerchio su un asse
-*/
-function makeCircleProjection(circle, axis) {
-  var normal = axis.perp();
-  //trovo i punti del cerchio che corrispondono agli estremi della proiezione
-  var v1 = new point(circle.center.x + (-normal.y * circle.radius), circle.center.y + (normal.x * circle.radius));
-  var v2 = new point(circle.center.x + (normal.y * circle.radius), circle.center.y + (-normal.x * circle.radius));
-  //proietto i due punti sull'asse
-  var min = axis.dotp(v1);
-  var max = min;
-  var p = axis.dotp(v2);
-  if (p < min)
-    min = p;
-  if (p > max)
-    max = p;
   return new projection(min, max);
 }
 
@@ -205,23 +161,6 @@ function betweenX(v1, v2, p) {
     return true;
   else
     return false;
-}
-
-function pointOnLine(v1, v2, p) {
-  return distance(v1, p) + distance(v2, p) == distance(v1, v2);
-}
-
-/*
-Trova il vertice più vicino al centro del cerchio
-*/
-function findClosestVertex(circle, shape) {
-  var minDistance = 2000;
-  var closestVertex = null;
-  for (var i=0; i<shape.vertices.length; i++) {
-    if (distance(shape.vertices[i], circle.center) < minDistance)
-      closestVertex = shape.vertices[i];
-  }
-  return closestVertex;
 }
 
 /*
