@@ -43,10 +43,10 @@ function detectCircleShapeCollision(circle, shape) {
     var dot = edge.dotp(cirlceVect)/length;
     //trovo le coordinate della proiezione del centro sul vettore
     var cpoint = new point(v1.x + dot *(v2.x - v1.x), v1.y + dot * (v2.y - v1.y));
-    //var showP = new ball(cpoint, 10, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
-    if (!betweenX(v1, v2, cpoint) || !betweenY(v1, v2, cpoint))
+    var showP = new ball(cpoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
+    if (distance(v1, cpoint) + distance(v2, cpoint) != length)
       continue;
-    if (distance(cpoint, circle.center) < circle.radius)
+    if (distance(cpoint, circle.center) <= circle.radius)
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
       return true;
     else
@@ -148,16 +148,6 @@ Calcola se l'ordinata del punto p è compresa tra quelle dei vertici v1 e v2
 */
 function betweenY(v1, v2, p) {
   if (p.y > Math.min(v1.y, v2.y) && p.y < Math.max(v1.y, v2.y))
-    return true;
-  else
-    return false;
-}
-
-/*
-Calcola se l'ascissa del punto p è compresa tra quelle dei vertici v1 e v2
-*/
-function betweenX(v1, v2, p) {
-  if (p.x > Math.min(v1.x, v2.x) && p.x < Math.max(v1.x, v2.x))
     return true;
   else
     return false;

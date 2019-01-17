@@ -89,7 +89,7 @@
 			var backgroundColor = new color(30, 30, 30).makeColor(1);
 			var backgroundColor2 = new color(10, 10, 10).makeColor(1);
 			var gravity = 0;
-			var bounce = -1;
+			var bounce = -0.6;
 			var ballClicked = false;
 			var shotPoint = null;
 			var dragging = false;
@@ -139,6 +139,8 @@
 									placedPolygons[i].size *= 2/3;
 								}
 							}
+							myBall.center.x = myBall.center.x*2/3 + canvas.width/6;
+							myBall.center.y = myBall.center.y*2/3 + canvas.height/6;
 						}
 						setEditorListeners();
 						showButtons("editor");
@@ -151,6 +153,8 @@
 								placedPolygons[i].size *= 3/2;
 							}
 						}
+						myBall.center.x = (myBall.center.x - canvas.width/6)*3/2;
+						myBall.center.y = (myBall.center.y - canvas.height/6)*3/2;
 					}
 				}
 				//disegna gli oggetti
@@ -236,7 +240,7 @@
 						break;
 					case "playing":
 						clearPolygons();
-						myBall = new ball(new point(canvas.width*11/12, canvas.height/2), 15, new color(255, 255, 255), new color(0, 255, 0), 10, 5);
+						myBall = new ball(new point(canvas.width*11/12, canvas.height/2), 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						break;
 				}
 			}
@@ -272,7 +276,6 @@
 				if (gameState == "editor") {
 					for (var i=0; i<placedPolygons.length; i++) {
 						if (placedPolygons[i] != null && contains(placedPolygons[i], mousePoint)) {
-							console.log(key);
 							if (key == 37)
 								placedPolygons[i].rotation += Math.PI/12;
 							if (key == 39)
@@ -290,7 +293,7 @@
 				if (gameState == "editor" && draggingBall) {
 					myBall.center = mousePoint;
 					for (var i=0; i<placedPolygons.length; i++) {
-						if (contains(placedPolygons[i], mousePoint) || detectCircleShapeCollision(myBall, placedPolygons[i])) {
+						if (placedPolygons[i] != null && (contains(placedPolygons[i], mousePoint) || detectCircleShapeCollision(myBall, placedPolygons[i]))) {
 							myBall.changeShadowColor(new color(0, 0, 255));
 							ballColliding = true;
 							break;
