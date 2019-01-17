@@ -293,6 +293,7 @@
 						if (contains(placedPolygons[i], mousePoint) || detectCircleShapeCollision(myBall, placedPolygons[i])) {
 							myBall.changeShadowColor(new color(0, 0, 255));
 							ballColliding = true;
+							break;
 						}
 						else {
 							myBall.changeShadowColor(new color(0, 255, 0));
