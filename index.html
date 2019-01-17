@@ -95,6 +95,8 @@
 			var dragging = false;
 			var draggingIndex = -1;
 			var placedPolygons = [];
+			var draggingBall = false;
+			var ballColliding = false;
 			var placedCenters = [];
 			var draggedPolygon = null;
 			var npp = 0;
@@ -187,6 +189,7 @@
 							if (i != draggingIndex && placedPolygons[i] != null)
 								placedPolygons[i].drawWithLights(placedCenters[i]);
 						}
+						myBall.drawWithLights();
 						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/6));
 						break;
 
@@ -199,7 +202,7 @@
 						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								if (detectCircleShapeCollision2(myBall, placedPolygons[i])) {
+								if (detectCircleShapeCollision(myBall, placedPolygons[i])) {
 									myBall.vx = -myBall.vx;
 									myBall.vy = -myBall.vy;
 								}
@@ -217,7 +220,7 @@
 					case "opening":
 						clearPolygons();
 						polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, 0.5, 1, false);
+																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, -0.2, 1, false);
 						polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
 																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5, 1, false);
 						break;
@@ -227,7 +230,9 @@
 						for (var i=0; i<4; i++) {
 							polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0, 0, false);
 						}
+						myBall = new ball(new point(canvas.width*11/12, canvas.height/2), 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						gravity = 0;
+
 						break;
 					case "playing":
 						clearPolygons();
@@ -264,6 +269,17 @@
 						changeGameState("editor");
 					}
 				}
+				if (gameState == "editor") {
+					for (var i=0; i<placedPolygons.length; i++) {
+						if (placedPolygons[i] != null && contains(placedPolygons[i], mousePoint)) {
+							console.log(key);
+							if (key == 37)
+								placedPolygons[i].rotation += Math.PI/12;
+							if (key == 39)
+								placedPolygons[i].rotation -= Math.PI/12;
+						}
+					}
+				}
 			}
 
 			/*
@@ -271,6 +287,19 @@
 			*/
 			function updateMouseCoordinates(event) {
 				mousePoint = findRelativeCoordinates(event.clientX, event.clientY);
+				if (gameState == "editor" && draggingBall) {
+					myBall.center = mousePoint;
+					for (var i=0; i<placedPolygons.length; i++) {
+						if (contains(placedPolygons[i], mousePoint) || detectCircleShapeCollision(myBall, placedPolygons[i])) {
+							myBall.changeShadowColor(new color(0, 0, 255));
+							ballColliding = true;
+						}
+						else {
+							myBall.changeShadowColor(new color(0, 255, 0));
+							ballColliding = false;
+						}
+					}
+				}
 			}
 
 			/*
@@ -280,7 +309,7 @@
 				switch(gameState) {
 					case "editor":
 					 for(var i=0; i<placedPolygons.length; i++) {
-						 if (contains(placedPolygons[i], mousePoint)) {
+						 if ( placedPolygons[i] != null && contains(placedPolygons[i], mousePoint)) {
 							 choosedPolygon = clonePolygon(placedPolygons[i]);
 						 }
 					 }
@@ -311,10 +340,45 @@
 							draggedPolygon = clonePolygon(placedPolygons[i]);
 						}
 					}
+					if (mouseInCircle(myBall.center, myBall.radius)) {
+						draggingBall = true;
+					}
 				}
 			}
 
 			function mouseUp() {
+				if (gameState == "editor") {
+					if (dragging) {
+						if (mouseInRectangle(rectangleEditor)) {
+							if (draggingIndex == -1) {
+								//sto trascianndo un nuovo poligono
+								placedPolygons[npp] = clonePolygon(draggedPolygon);
+								placedCenters[npp] = mousePoint;
+								npp = findFreeSpot();
+							}
+							else {
+								//sto trascinando un poligono già piazzato
+								placedCenters[draggingIndex] = mousePoint;
+								draggingIndex = -1;
+							}
+						}
+						//ho trascinato un poligono fuori dal rettangolo
+						else if (draggingIndex != -1) {
+							placedPolygons[draggingIndex] = null;
+							placedCenters[draggingIndex] = null;
+							npp = findFreeSpot();
+						}
+						draggedPolygon = null;
+						dragging = false;
+					}
+					if (draggingBall) {
+						if (!mouseInRectangle(rectangleEditor, mousePoint) || ballColliding) {
+							myBall.center = new point(canvas.width*11/12, canvas.height/2);
+							myBall.changeShadowColor(new color(0, 255, 0));
+						}
+						draggingBall = false;
+					}
+				}
 				if (gameState == "playing") {
 					if (ballClicked == true) {
 						shotPoint = mousePoint;
@@ -326,28 +390,6 @@
 					}
 					myBall.line = false;
 				}
-				if (gameState == "editor") {
-					if (dragging) {
-						if (mouseInRectangle(rectangleEditor)) {
-							if (draggingIndex == -1) {
-								placedPolygons[npp] = clonePolygon(draggedPolygon);
-								placedCenters[npp] = mousePoint;
-								npp = findFreeSpot();
-							}
-							else {
-								placedCenters[draggingIndex] = mousePoint;
-								draggingIndex = -1;
-							}
-						}
-						else {
-							placedPolygons[draggingIndex] = null;
-							placedCenters[draggingIndex] = null;
-							npp = draggingIndex;
-						}
-						draggedPolygon = null;
-						dragging = false;
-					}
-				}
 			}
 
 			function clearPolygons() {
@@ -358,11 +400,11 @@
 			function findFreeSpot() {
 				place = -1;
 				for (var i=0; i<placedPolygons.length; i++) {
-					if (placedPolygons == null)
+					if (placedPolygons[i] == null)
 						place = i;
 				}
 				if (place == -1) {
-					place = placedPolygons.length + 1;
+					place = placedPolygons.length;
 				}
 				return place;
 			}

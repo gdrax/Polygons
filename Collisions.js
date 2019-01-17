@@ -29,7 +29,7 @@ function detectCollision(s1, s2) {
 /*
 Determina se un cerchio e un poligono stanno collidendo
 */
-function detectCircleShapeCollision2(circle, shape) {
+function detectCircleShapeCollision(circle, shape) {
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
     var v1 = shape.vertices[i];

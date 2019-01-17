@@ -261,6 +261,10 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
     this.vx = vx;
     this.vy = vy;
   }
+
+  this.changeShadowColor = function(newShadowColor) {
+    this.shadowColor = newShadowColor.makeColor(1);
+  }
 }
 
 /*
