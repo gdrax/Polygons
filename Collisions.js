@@ -57,27 +57,19 @@ function detectCircleShapeCollision2(circle, shape) {
     var v1 = shape.vertices[i];
     var v2 = shape.vertices[(i+1)%shape.vertices.length];
     var edge = v1.subtract(v2).normalize();
-    var proj = edge.dotp(circle.center);
-    var showP = new ball(proj, 10, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
-    if (distance(proj, circle.center) < circle.radius)
-      return true;
-    else
-      return false;
-    /*
+    var cirlceVect = v1.subtract(circle.center);
     var length = distance(v1, v2);
-    var axis = circle.center.subtract(v1).normalize();
-    var dot = axis.dotp(edge);
-    var closestPoint = new point(v1.x + (dot * (v2.x - v1.x)), v1.y + (dot * (v2.y - v1.y)));
-    var showP = new ball(closestPoint, 10, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
-    if (pointOnLine(v1, v2, closestPoint)) {
-      return false;
-    }
-    var dist = distance(circle.center, closestPoint);
-    if (dist < circle.radius)
+    var dot = edge.dotp(cirlceVect)/length;
+    var cpoint = new point(v1.x + dot *(v2.x - v1.x), v1.y + dot * (v2.y - v1.y));
+    //var showP = new ball(cpoint, 10, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
+    if (!betweenX(v1, v2, cpoint) || !betweenY(v1, v2, cpoint))
+      continue;
+    if (distance(cpoint, circle.center) < circle.radius)
       return true;
     else
-      return false;*/
+      continue;
   }
+  return false;
 }
 
 /*
