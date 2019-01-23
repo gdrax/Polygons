@@ -85,6 +85,7 @@
 			var rectangleEditor = null;
 			var polygons = [];
 			var myBall = null;
+			var myBallCenter = new point(canvas.width*11/12, canvas.height/2);
 			var animation = null;
 			var backgroundColor = new color(30, 30, 30).makeColor(1);
 			var backgroundColor2 = new color(10, 10, 10).makeColor(1);
@@ -139,8 +140,8 @@
 									placedPolygons[i].size *= 2/3;
 								}
 							}
-							myBall.center.x = myBall.center.x*2/3 + canvas.width/6;
-							myBall.center.y = myBall.center.y*2/3 + canvas.height/6;
+							myBallCenter.x = myBallCenter.x*2/3 + canvas.width/6;
+							myBallCenter.y = myBallCenter.y*2/3 + canvas.height/6;
 						}
 						setEditorListeners();
 						showButtons("editor");
@@ -153,8 +154,8 @@
 								placedPolygons[i].size *= 3/2;
 							}
 						}
-						myBall.center.x = (myBall.center.x - canvas.width/6)*3/2;
-						myBall.center.y = (myBall.center.y - canvas.height/6)*3/2;
+						myBallCenter.x = (myBallCenter.x - canvas.width/6)*3/2;
+						myBallCenter.y = (myBallCenter.y - canvas.height/6)*3/2;
 					}
 				}
 				//disegna gli oggetti
@@ -203,6 +204,7 @@
 								placedPolygons[i].drawWithLights(placedCenters[i]);
 							}
 						}
+						console.log(myBallCenter.x, myBallCenter.y);
 						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
@@ -234,13 +236,13 @@
 						for (var i=0; i<4; i++) {
 							polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0, 0, false);
 						}
-						myBall = new ball(new point(canvas.width*11/12, canvas.height/2), 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
+						myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						gravity = 0;
 
 						break;
 					case "playing":
 						clearPolygons();
-						myBall = new ball(new point(canvas.width*11/12, canvas.height/2), 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
+						myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						break;
 				}
 			}
@@ -380,6 +382,8 @@
 							myBall.center = new point(canvas.width*11/12, canvas.height/2);
 							myBall.changeShadowColor(new color(0, 255, 0));
 						}
+						else
+							myBallCenter = myBall.center;
 						draggingBall = false;
 					}
 				}

@@ -195,7 +195,7 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle, sB, d
 Oggetto che modella un cerchio
 */
 function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
-  this.center = center;
+  this.center = new point(center.x, center.y);
   this.radius = radius;
   this.strokeColor = strokeColor.makeColor(1);
   this.shadowColor = shadowColor.makeColor(1);
