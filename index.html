@@ -140,8 +140,7 @@
 									placedPolygons[i].size *= 2/3;
 								}
 							}
-							myBallCenter.x = myBallCenter.x*2/3 + canvas.width/6;
-							myBallCenter.y = myBallCenter.y*2/3 + canvas.height/6;
+							myBallCenter = myBall.center;
 						}
 						setEditorListeners();
 						showButtons("editor");
@@ -154,8 +153,8 @@
 								placedPolygons[i].size *= 3/2;
 							}
 						}
-						myBallCenter.x = (myBallCenter.x - canvas.width/6)*3/2;
-						myBallCenter.y = (myBallCenter.y - canvas.height/6)*3/2;
+						myBall.center.x = (myBall.center.x - canvas.width/6)*3/2;
+						myBall.center.y = (myBall.center.y - canvas.height/6)*3/2;
 					}
 				}
 				//disegna gli oggetti
@@ -205,7 +204,6 @@
 							}
 						}
 						console.log(myBallCenter.x, myBallCenter.y);
-						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
 								if (detectCircleShapeCollision(myBall, placedPolygons[i])) {
@@ -214,6 +212,7 @@
 								}
 							}
 						}
+						myBall.drawWithLights();
 						break;
 				}
 			}
@@ -380,10 +379,10 @@
 					if (draggingBall) {
 						if (!mouseInRectangle(rectangleEditor, mousePoint) || ballColliding) {
 							myBall.center = new point(canvas.width*11/12, canvas.height/2);
+
 							myBall.changeShadowColor(new color(0, 255, 0));
 						}
-						else
-							myBallCenter = myBall.center;
+						myBallCenter = myBall.center;
 						draggingBall = false;
 					}
 				}
@@ -392,7 +391,7 @@
 						shotPoint = mousePoint;
 						var vx = shotPoint.x - myBall.center.x;
 						var vy = shotPoint.y - myBall.center.y;
-						myBall.setSpeed(-vx/2, -vy/2);
+						myBall.setSpeed(-vx/5, -vy/5);
 						ballClicked = false;
 						gravity = 1;
 					}

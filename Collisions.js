@@ -43,7 +43,7 @@ function detectCircleShapeCollision(circle, shape) {
     var dot = edge.dotp(cirlceVect)/length;
     //trovo le coordinate della proiezione del centro sul vettore
     var cpoint = new point(v1.x + dot *(v2.x - v1.x), v1.y + dot * (v2.y - v1.y));
-    var showP = new ball(cpoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
+    ///var showP = new ball(cpoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
     if (distance(v1, cpoint) + distance(v2, cpoint) != length)
       continue;
     if (distance(cpoint, circle.center) <= circle.radius)
@@ -51,6 +51,8 @@ function detectCircleShapeCollision(circle, shape) {
       return true;
     else
       continue;
+    if (contains(shape, circle.center))
+      return true;
   }
   return false;
 }
