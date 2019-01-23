@@ -75,9 +75,9 @@ function mouseInTriangle(point1, point2, point3) {
 Controlla se il mouse si trova all'interno del triangolo
 @return: true se il mouse si trova all'interno, false altrimenti
 */
-function mouseInCircle(center, radius) {
-  var distance = Math.sqrt((mousePoint.x - center.x)*(mousePoint.x - center.x)+(mousePoint.y - center.y)*(mousePoint.y - center.y));
-  if (distance <= radius)
+function mouseInCircle(circle) {
+  var distance = Math.sqrt((mousePoint.x - circle.center.x)*(mousePoint.x - circle.center.x)+(mousePoint.y - circle.center.y)*(mousePoint.y - circle.center.y));
+  if (distance <= circle.radius)
     return true;
   else
     return false;

@@ -227,7 +227,7 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
     if (this.line)
       this.drawTargetLine();
     var r = this.radius;
-    if (mouseInCircle(this.center, this.radius)) {
+    if (mouseInCircle(this)) {
       this.radius += 0.001;
       this.draw(true);
     }

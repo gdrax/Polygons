@@ -324,7 +324,7 @@
 
 			function mouseDown() {
 				if (gameState == "playing") {
-					if (mouseInCircle(myBall.center, myBall.radius)) {
+					if (mouseInCircle(myBall)) {
 						ballClicked = true;
 					}
 					myBall.line = true;
@@ -345,7 +345,7 @@
 							draggedPolygon = clonePolygon(placedPolygons[i]);
 						}
 					}
-					if (mouseInCircle(myBall.center, myBall.radius)) {
+					if (mouseInCircle(myBall)) {
 						draggingBall = true;
 					}
 				}
