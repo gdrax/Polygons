@@ -101,6 +101,7 @@
 			var placedCenters = [];
 			var draggedPolygon = null;
 			var npp = 0;
+			var vIndex = -1;
 
 			clearArea();
 			//imposto primo stato di gioco
@@ -207,8 +208,8 @@
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
 								if (detectCircleShapeCollision(myBall, placedPolygons[i])) {
-									myBall.vx = -myBall.vx;
-									myBall.vy = -myBall.vy;
+									var edge = placedPolygons[i].vertices[vIndex].subtract(placedPolygons[i].vertices[vIndex + 1 % placedPolygons[i].vertices.length]);
+									updateV(myBall, edge);
 								}
 							}
 						}

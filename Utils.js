@@ -134,3 +134,16 @@ function findRelativeCoordinates(x, y) {
   }
   return new point(offsetX, offsetY);
 }
+
+function updateV(circle, edge) {
+  var norm = edge.perp();
+  console.log(edge);
+  var norm = norm.normalize();
+  var v = new vector(myBall.vx, myBall.vy).normalize();
+  var dp = v.dotp(norm);
+  var u = new vector(norm.x * dp, norm.y * dp);
+  var w = new vector(v.x - u.x, v.y - u.y);
+  console.log(u, w, dp, v, edge);
+  myBall.vx = w.x - u.x;
+  myBall.vy = w.y - u.y;
+}
