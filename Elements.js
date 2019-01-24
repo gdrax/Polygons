@@ -8,17 +8,6 @@ function roundRectangle(width, height, shadowColor) {
   this.color = new color(255, 255, 255).makeColor(1);
   this.radius = 10; //raggio degli angoli rotondi
   this.rpoint = null;
-  this.arrowOffsetX = null; //distanza delle frecce laterali dal rettangolo
-  //vertici delle frecce
-  this.leftp1 = null;
-  this.leftp2 = null;
-  this.leftp3 = null;
-  this.rightp1 = null;
-  this.rightp2 = null;
-  this.rightp3 = null;
-  //per mostrare le frecce
-  this.showLeftArrow = false;
-  this.showRightArrow = true;
 
   //imposta la largheza del rettangolo
   this.setWidth = function(width) {
@@ -69,63 +58,6 @@ function roundRectangle(width, height, shadowColor) {
     }
     this.draw(this.rpoint, false);
     return shadows;
-  }
-
-  /*
-  Disegna una freccia (trinagolo)
-  @param p1, p2, p3: vertici del triangolo
-  @param s: offset per disegnare le ombre
-  @shadows: true per disegnare l'ombra, false per disegnare il triangolo
-  */
-  this.drawArrow = function(p1, p2, p3, s, shadows) {
-    ctx.beginPath();
-    ctx.moveTo(p1.x - s, p1.y + s);
-    ctx.lineTo(p2.x - s, p2.y + s);
-    ctx.lineTo(p3.x - s, p3.y + s);
-    ctx.lineTo(p1.x - s, p1.y + s);
-    setColors(this.color, null, null);
-    ctx.fill();
-    setColors(this.color, this.shadowColor, null);
-    if (shadows) {
-      ctx.strokeStyle = this.shadowColor;
-    }
-    else
-      ctx.strokeStyle = this.color;
-    ctx.stroke();
-  }
-
-  /*
-  Disegna le frecce con le ombre
-  */
-  this.drawArrowsWithLights = function() {
-    this.arrowOffsetX = this.width/20; 	//distanza delle frecce dai lati del rettangolo e grandezza delle frecce
-    //definisco vertici dei trinagoli
-    this.leftp1 = new point(this.rpoint.x - this.arrowOffsetX, this.rpoint.y + this.height/2 - this.arrowOffsetX);
-    this.leftp2 = new point(this.rpoint.x - this.arrowOffsetX*2, this.rpoint.y + this.height/2);
-    this.leftp3 = new point(this.rpoint.x - this.arrowOffsetX, this.rpoint.y + this.height/2 + this.arrowOffsetX);
-    this.rightp1 = new point(this.rpoint.x + this.width + this.arrowOffsetX, this.rpoint.y + this.height/2 - this.arrowOffsetX);
-    this.rightp2 = new point(this.rpoint.x + this.width + this.arrowOffsetX*2, this.rpoint.y + this.height/2);
-    this.rightp3 = new point(this.rpoint.x + this.width + this.arrowOffsetX, this.rpoint.y + this.height/2 + this.arrowOffsetX);
-
-    //disegno le ombre della freccia di sinistra
-    if (mouseInTriangle(this.leftp1, this.leftp2, this.leftp3) && this.showLeftArrow) {
-      this.drawArrow(this.leftp1, this.leftp2, this.leftp3, this.height/1000, true);
-      this.drawArrow(this.leftp1, this.leftp2, this.leftp3, -this.height/1000, true);
-    }
-
-    //disegno le ombre della freccia di destra
-    if (mouseInTriangle(this.rightp1, this.rightp2, this.rightp3) && this.showRightArrow) {
-      this.drawArrow(this.rightp1, this.rightp2, this.rightp3, this.height/1000, true);
-      this.drawArrow(this.rightp1, this.rightp2, this.rightp3, -this.height/1000, true)
-    }
-
-    //disegno la freccia di sinistra
-    if (this.showLeftArrow)
-      this.drawArrow(this.leftp1, this.leftp2, this.leftp3, 0, false);
-
-    //disegno la freccia di destra
-    if (this.showRightArrow)
-      this.drawArrow(this.rightp1, this.rightp2, this.rightp3, 0, false);
   }
 }
 
@@ -293,11 +225,4 @@ function color(red, green, blue) {
 	this.makeHexColor = function() {
 		return "#"+this.hex;
 	}
-}
-
-
-function drawTargetLine(circle) {
-  v = circle.center.subtract(mousePoint);
-  oppositePoint = new point(circle.center.x - v.x, circle.center.y - v.y);
-  drawDashLine(oppositePoint, circle.center, new color(255, 255, 255));
 }

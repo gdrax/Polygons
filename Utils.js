@@ -1,3 +1,4 @@
+//imposta i colori
 function setColors(stroke, shadow, fill) {
   if (stroke != null)
     ctx.strokeStyle = stroke;
@@ -18,29 +19,7 @@ function setColors(stroke, shadow, fill) {
 }
 
 /*
-Imposta le frecce da mostrare
-*/
-function updateArrows() {
-  switch(levelNumber) {
-    //primo livello, solo freccia a dx
-    case firstLevel:
-      levelRect.showLeftArrow = false;
-      levelRect.showRightArrow = true;
-      break;
-    //ultimo livello, solo freccia a sx
-    case lastLevel:
-      levelRect.showLeftArrow = true;
-      levelRect.showRightArrow = false;
-      break;
-    default:
-      levelRect.showLeftArrow = true;
-      levelRect.showRightArrow = true;
-  }
-}
-
-/*
 Controlla se il mouse si trova nel rettangolo
-@return: true se il mouse si trova all'interno, false altrimenti
 */
 function mouseInRectangle(rect) {
   if (mousePoint.x >= rect.rpoint.x && mousePoint.x <= rect.rpoint.x + rect.width && mousePoint.y >= rect.rpoint.y && mousePoint.y <= rect.rpoint.y + rect.height)
@@ -50,30 +29,7 @@ function mouseInRectangle(rect) {
 }
 
 /*
-TODO: why?
-*/
-function sign(point1, point2, point3) {
-  return (point1.x - point3.x)*(point2.y - point3.y)-(point2.x - point3.x)*(point1.y - point3.y);
-}
-
-/*
-Controlla se il mouse si trova all'interno del triangolo
-@return: true se il mouse si trova all'interno, false altrimenti
-*/
-function mouseInTriangle(point1, point2, point3) {
-  var d1 = sign(mousePoint, point1, point2);
-  var d2 = sign(mousePoint, point2, point3);
-  var d3 = sign(mousePoint, point3, point1);
-
-  var hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-  var hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-  return !(hasNeg && hasPos);
-}
-
-/*
-Controlla se il mouse si trova all'interno del triangolo
-@return: true se il mouse si trova all'interno, false altrimenti
+Controlla se il mouse si trova all'interno del cerchio
 */
 function mouseInCircle(circle) {
   var distance = Math.sqrt((mousePoint.x - circle.center.x)*(mousePoint.x - circle.center.x)+(mousePoint.y - circle.center.y)*(mousePoint.y - circle.center.y));
@@ -83,6 +39,9 @@ function mouseInCircle(circle) {
     return false;
 }
 
+/*
+Cambia la velocità dei poligoni quando urtano un bordo
+*/
 function bouncePolygons() {
   for (var i=0; i<polygons.length; i++) {
     for (var j=0; j<polygons[i].vertices.length; j++) {
@@ -105,6 +64,9 @@ function applyBonus(ball, poly) {
   ball.vy *= poly.speedBonus;
 }
 
+/*
+Disegna una linea tratteggiata
+*/
 function drawDashLine(p1, p2, c) {
   setColors(c.makeColor(1), c.makeColor(1), null);
   ctx.setLineDash([8, 7]);
@@ -115,6 +77,9 @@ function drawDashLine(p1, p2, c) {
   ctx.setLineDash([]);
 }
 
+/*
+Copia un poligono
+*/
 function clonePolygon(p) {
   var newP = new polygon(p.sides, p.size, new color(255, 255, 255), new color(255, 255, 255), p.rv, p.vx, p.vy, p.angle, p.speedBonus, p.doubleBall);
   newP.strokeColor = p.strokeColor;
@@ -123,6 +88,9 @@ function clonePolygon(p) {
   return newP;
 }
 
+/*
+Trova le coordinate realative dentro il canvas
+*/
 function findRelativeCoordinates(x, y) {
   var offsetX = x;
   var offsetY = y;
@@ -135,6 +103,9 @@ function findRelativeCoordinates(x, y) {
   return new point(offsetX, offsetY);
 }
 
+/*
+Cambia le componenti velocità della palla al contatto con un poligono
+*/
 function updateV(circle, edge) {
   var norm = edge.perp();
   console.log(edge);
@@ -146,4 +117,13 @@ function updateV(circle, edge) {
   console.log(u, w, dp, v, edge);
   myBall.vx = w.x - u.x;
   myBall.vy = w.y - u.y;
+}
+
+/*
+Disegna la linea di mira della palla
+*/
+function drawTargetLine(circle) {
+  v = circle.center.subtract(mousePoint);
+  oppositePoint = new point(circle.center.x - v.x, circle.center.y - v.y);
+  drawDashLine(oppositePoint, circle.center, new color(255, 255, 255));
 }

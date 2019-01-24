@@ -36,26 +36,26 @@ function detectCircleShapeCollision(circle, shape) {
     var v1 = shape.vertices[i];
     var v2 = shape.vertices[(i+1)%shape.vertices.length];
     //calcolo il vettore su cui si trova il lato, e lo normalizzo
-    var edge = v1.subtract(v2).normalize();
+    var edge = v1.subtract(v2);
     //calcolo il vettore con il centro del cerchio
-    var cirlceVect = v1.subtract(circle.center);
+    var circleVect = v1.subtract(circle.center);
     var length = distance(v1, v2);
     //calcolo il prodotto scalare
-    var dot = edge.dotp(cirlceVect)/length;
+    var dot = edge.dotp(circleVect)/(length*length);
     //trovo le coordinate della proiezione del centro sul vettore
-    var cpoint = new point(v1.x + dot *(v2.x - v1.x), v1.y + dot * (v2.y - v1.y));
-    ///var showP = new ball(cpoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
+    var cpoint = new point(v1.x + dot * edge.x, v1.y + dot * edge.y);
+    var showP = new ball(cpoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
     if (distance(v1, cpoint) + distance(v2, cpoint) != length)
       continue;
     if (distance(cpoint, circle.center) <= circle.radius) {
       vIndex = i;
+      console.log("<<<<<<<=====");
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
       return true;
     }
-    else
-      continue;
     if (contains(shape, circle.center)) {
       vIndex = i;
+      console.log("INSIDE");
       return true;
     }
   }
@@ -126,12 +126,12 @@ function contains(shape, point) {
 Calcola se il semiasse orizzontale che parte da p incrocia il segmento v1-v2 (lato del poligono)
 */
 function crossing(v1, v2, p) {
-  //retta orizzontale, non si incrocia
+  //retta orizzontale
   if (v1.y == v2.y)
-      return false
+    return false;
   //retta verticale
   if (v1.x == v2.x)
-    //se la y del punto p è compresa nel segmento p si trova a sinistra della retta, si incrociano
+    //se la y del punto p è compresa nel segmento p e si trova a sinistra della retta, si incrociano
     if (v1.x > p.x && betweenY(v1, v2, p))
       return true;
     else
@@ -140,7 +140,7 @@ function crossing(v1, v2, p) {
   if (!betweenY(v1, v2, p) || (v1.x < p.x && v2.x < p.x))
     return false;
   //calcolo retta passante per i due vertici
-  var r = new rect((v1.y - v2.y)/(v1.x - v2.x), (v1.x*v2.y - v2.x*v1.y)/(v1.x - v2.x));
+  var r = new retta((v1.y - v2.y)/(v1.x - v2.x), (v1.x*v2.y - v2.x*v1.y)/(v1.x - v2.x));
   //calcolo la x dell'incrocio tra le due rette
   var x = (p.y - r.q)/r.m;
   //se il punto è a sinistra del punto di incontro si incrociano
@@ -202,7 +202,7 @@ function vector(x, y) {
   }
 }
 
-function rect(m, q) {
+function retta(m, q) {
   this.m = m;
   this.q = q;
 }
