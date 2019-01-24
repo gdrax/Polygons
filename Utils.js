@@ -110,11 +110,9 @@ function updateV(circle, norm, length) {
   var v = new vector(myBall.vx, myBall.vy);
   var dp = norm.dotp(v)/(length * length);
   var u = new vector(dp * norm.x, dp * norm.y);
-  console.log(u);
   var w = new vector(v.x - u.x, v.y - u.y);
-  myBall.vx = w.x - u.x;
-  myBall.vy = w.y - u.y;
-  console.log(myBall.vx, myBall.vy);
+  myBall.vx = (w.x - u.x)*bounce;
+  myBall.vy = (w.y - u.y)*bounce;
 }
 
 /*

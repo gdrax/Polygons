@@ -210,6 +210,8 @@
 								result = detectCircleShapeCollision(myBall, placedPolygons[i])
 								if (result.overlaps == true) {
 									if (result.p != null) {
+										if (result.isInside)
+											pushOut(result.closestPoint, result.p);
 										updateV(myBall, result.p, result.elength);
 									}
 								}

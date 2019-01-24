@@ -33,7 +33,9 @@ function detectCircleShapeCollision(circle, shape) {
   var result = {
     overlaps: false,
     p: null,
-    elength: 0
+    elength: 0,
+    isInside: false,
+    closestPoint: null
   };
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
@@ -55,14 +57,16 @@ function detectCircleShapeCollision(circle, shape) {
       console.log("<<<<<<<=====");
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
       result.overlaps = true;
-      result.p = edge.perp();
-      result.elength = length;
+      result.closestPoint = cpoint;
     }
   }
   if (contains(shape, circle.center)) {
     console.log("INSIDE");
     result.overlaps = true;
+    result.isInside = true;
   }
+  result.p = edge.perp();
+  result.elength = length;
   return result;
 }
 
