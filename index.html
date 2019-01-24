@@ -204,15 +204,17 @@
 								placedPolygons[i].drawWithLights(placedCenters[i]);
 							}
 						}
+						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								if (detectCircleShapeCollision(myBall, placedPolygons[i])) {
-									var edge = placedPolygons[i].vertices[vIndex].subtract(placedPolygons[i].vertices[vIndex + 1 % placedPolygons[i].vertices.length]);
-									updateV(myBall, edge);
+								result = detectCircleShapeCollision(myBall, placedPolygons[i])
+								if (result.overlaps == true) {
+									if (result.p != null) {
+										updateV(myBall, result.p, result.elength);
+									}
 								}
 							}
 						}
-						myBall.drawWithLights();
 						break;
 				}
 			}
@@ -294,7 +296,7 @@
 				if (gameState == "editor" && draggingBall) {
 					myBall.center = mousePoint;
 					for (var i=0; i<placedPolygons.length; i++) {
-						if (placedPolygons[i] != null && detectCircleShapeCollision(myBall, placedPolygons[i])) {
+						if (placedPolygons[i] != null && detectCircleShapeCollision(myBall, placedPolygons[i]).overlaps == true) {
 							myBall.changeShadowColor(new color(0, 0, 255));
 							ballColliding = true;
 							break;

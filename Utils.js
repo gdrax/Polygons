@@ -106,17 +106,15 @@ function findRelativeCoordinates(x, y) {
 /*
 Cambia le componenti velocità della palla al contatto con un poligono
 */
-function updateV(circle, edge) {
-  var norm = edge.perp();
-  console.log(edge);
-  var norm = norm.normalize();
-  var v = new vector(myBall.vx, myBall.vy).normalize();
-  var dp = v.dotp(norm);
-  var u = new vector(norm.x * dp, norm.y * dp);
+function updateV(circle, norm, length) {
+  var v = new vector(myBall.vx, myBall.vy);
+  var dp = norm.dotp(v)/(length * length);
+  var u = new vector(dp * norm.x, dp * norm.y);
+  console.log(u);
   var w = new vector(v.x - u.x, v.y - u.y);
-  console.log(u, w, dp, v, edge);
   myBall.vx = w.x - u.x;
   myBall.vy = w.y - u.y;
+  console.log(myBall.vx, myBall.vy);
 }
 
 /*
