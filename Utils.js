@@ -105,12 +105,14 @@ function applyBonus(ball, poly) {
   ball.vy *= poly.speedBonus;
 }
 
-function drawLine(p1, p2, c) {
+function drawDashLine(p1, p2, c) {
   setColors(c.makeColor(1), c.makeColor(1), null);
+  ctx.setLineDash([8, 7]);
   ctx.beginPath();
   ctx.moveTo(p1.x, p1.y);
   ctx.lineTo(p2.x, p2.y);
   ctx.stroke();
+  ctx.setLineDash([]);
 }
 
 function clonePolygon(p) {

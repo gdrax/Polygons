@@ -225,7 +225,7 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
 
   this.drawWithLights = function() {
     if (this.line)
-      this.drawTargetLine();
+      drawTargetLine(this);
     var r = this.radius;
     if (mouseInCircle(this)) {
       this.radius += 0.001;
@@ -235,10 +235,6 @@ function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
     this.draw(false);
     this.borderBounce();
     this.move();
-  }
-
-  this.drawTargetLine = function() {
-    drawLine(mousePoint, this.center, new color(255, 255, 255));
   }
 
   this.move = function() {
@@ -297,4 +293,11 @@ function color(red, green, blue) {
 	this.makeHexColor = function() {
 		return "#"+this.hex;
 	}
+}
+
+
+function drawTargetLine(circle) {
+  v = circle.center.subtract(mousePoint);
+  oppositePoint = new point(circle.center.x - v.x, circle.center.y - v.y);
+  drawDashLine(oppositePoint, circle.center, new color(255, 255, 255));
 }
