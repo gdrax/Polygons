@@ -211,7 +211,7 @@
 								if (result.overlaps == true) {
 									if (result.p != null) {
 										if (result.isInside)
-											pushOut(result.p);
+											pushOut(result.closestPoint, myBall);
 										updateV(myBall, result.p, result.elength);
 									}
 								}

@@ -115,6 +115,14 @@ function updateV(circle, norm, length) {
   myBall.vy = (w.y - u.y)*bounce;
 }
 
+function pushOut(cPoint, circle) {
+  var v = new vector(circle.vx, circle.vy).normalize();
+  console.log(v);
+  var newCenter = new point(cPoint.x - circle.radius*v.x, cPoint.y - circle.radius*v.y);
+  circle.center = newCenter;
+  console.log(circle.center);
+}
+
 /*
 Disegna la linea di mira della palla
 */
