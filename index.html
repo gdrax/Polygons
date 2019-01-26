@@ -190,11 +190,12 @@
 						}
 						if (dragging)
 							draggedPolygon.drawWithLights(mousePoint);
+						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (i != draggingIndex && placedPolygons[i] != null)
 								placedPolygons[i].drawWithLights(placedCenters[i]);
+								result = detectCircleShapeCollision(myBall.center, myBall.radius, placedPolygons[i]);
 						}
-						myBall.drawWithLights();
 						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/6));
 						break;
 

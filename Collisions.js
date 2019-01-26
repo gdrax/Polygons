@@ -39,6 +39,7 @@ function detectCircleShapeCollision(center, radius, shape) {
   };
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
+    console.log("ITER"+i);
     var v1 = shape.vertices[i];
     var v2 = shape.vertices[(i+1)%shape.vertices.length];
     //calcolo il vettore su cui si trova il lato, e lo normalizzo
@@ -51,8 +52,18 @@ function detectCircleShapeCollision(center, radius, shape) {
     //trovo le coordinate della proiezione del centro sul vettore
     var cPoint = new point(v1.x + dot * edge.x, v1.y + dot * edge.y);
     var showP = new ball(cPoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
-    if (distance(v1, cPoint) + distance(v2, cPoint) > length)
+    /*if (distance(v1, cPoint) + distance(v2, cPoint) > length) {
+      var dist = distance(v1, cPoint)+distance(v2, cPoint);
+      console.log("A"+dist);
+      console.log("B"+length);
       continue;
+    }*/
+    var bigDot = dot * length*length;
+    console.log(bigDot);
+    console.log(circleVect);
+    if (bigDot < 0 || bigDot > edge.dotp(edge)) {
+      continue;
+    }
     if (distance(cPoint, center) <= radius) {
       console.log("<<<<<<<=====");
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
@@ -172,7 +183,7 @@ function betweenY(v1, v2, p) {
 Calcola la distanza tra due punti
 */
 function distance(p1, p2) {
-  return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+  return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y));
 }
 
 /*==============Oggetti==============*/
