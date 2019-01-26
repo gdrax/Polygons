@@ -29,7 +29,7 @@ function detectCollision(s1, s2) {
 /*
 Determina se un cerchio e un poligono stanno collidendo
 */
-function detectCircleShapeCollision(circle, shape) {
+function detectCircleShapeCollision(center, radius, shape) {
   var result = {
     overlaps: false,
     p: null,
@@ -44,23 +44,23 @@ function detectCircleShapeCollision(circle, shape) {
     //calcolo il vettore su cui si trova il lato, e lo normalizzo
     var edge = v1.subtract(v2);
     //calcolo il vettore con il centro del cerchio
-    var circleVect = v1.subtract(circle.center);
+    var circleVect = v1.subtract(center);
     var length = distance(v1, v2);
     //calcolo il prodotto scalare
     var dot = edge.dotp(circleVect)/(length*length);
     //trovo le coordinate della proiezione del centro sul vettore
-    var cpoint = new point(v1.x + dot * edge.x, v1.y + dot * edge.y);
-    var showP = new ball(cpoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
-    if (distance(v1, cpoint) + distance(v2, cpoint) > length)
+    var cPoint = new point(v1.x + dot * edge.x, v1.y + dot * edge.y);
+    var showP = new ball(cPoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
+    if (distance(v1, cPoint) + distance(v2, cPoint) > length)
       continue;
-    if (distance(cpoint, circle.center) <= circle.radius) {
+    if (distance(cPoint, center) <= radius) {
       console.log("<<<<<<<=====");
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
+      result.closestPoint = cPoint;
       result.overlaps = true;
-      result.closestPoint = cpoint;
     }
   }
-  if (contains(shape, circle.center)) {
+  if (contains(shape, center)) {
     console.log("INSIDE");
     result.overlaps = true;
     result.isInside = true;

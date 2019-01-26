@@ -90,7 +90,7 @@
 			var backgroundColor = new color(30, 30, 30).makeColor(1);
 			var backgroundColor2 = new color(10, 10, 10).makeColor(1);
 			var gravity = 0;
-			var bounce = -0.6;
+			var bounce = -0.9;
 			var ballClicked = false;
 			var shotPoint = null;
 			var dragging = false;
@@ -205,15 +205,15 @@
 							}
 						}
 						myBall.drawWithLights();
+						var nextCenter = new point(myBall.center.x + myBall.vx, myBall.center.y + myBall.vy);
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								result = detectCircleShapeCollision(myBall, placedPolygons[i])
+								result = detectCircleShapeCollision(nextCenter, myBall.radius, placedPolygons[i]);
 								if (result.overlaps == true) {
-									if (result.p != null) {
-										if (result.isInside)
-											pushOut(result.closestPoint, myBall);
-										updateV(myBall, result.p, result.elength);
-									}
+									//if (result.p != null) {
+										//pushOut(result.closestPoint, myBall);
+										updateV(myBall, result.p, result.elength, result.isInside);
+									//}
 								}
 							}
 						}
@@ -298,7 +298,7 @@
 				if (gameState == "editor" && draggingBall) {
 					myBall.center = mousePoint;
 					for (var i=0; i<placedPolygons.length; i++) {
-						if (placedPolygons[i] != null && detectCircleShapeCollision(myBall, placedPolygons[i]).overlaps == true) {
+						if (placedPolygons[i] != null && detectCircleShapeCollision(myBall.center, myBall.radius, placedPolygons[i]).overlaps == true) {
 							myBall.changeShadowColor(new color(0, 0, 255));
 							ballColliding = true;
 							break;
@@ -395,9 +395,10 @@
 						shotPoint = mousePoint;
 						var vx = shotPoint.x - myBall.center.x;
 						var vy = shotPoint.y - myBall.center.y;
-						myBall.setSpeed(-vx/5, -vy/5);
+						var v = new vector(shotPoint.x - myBall.center.x, shotPoint.y - myBall.center.y).normalize();
+						myBall.setSpeed(-v.x*30, -v.y*30);
 						ballClicked = false;
-						gravity = 1;
+						gravity = 0;
 					}
 					myBall.line = false;
 				}
