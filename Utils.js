@@ -32,8 +32,7 @@ function mouseInRectangle(rect) {
 Controlla se il mouse si trova all'interno del cerchio
 */
 function mouseInCircle(circle) {
-  var distance = Math.sqrt((mousePoint.x - circle.center.x)*(mousePoint.x - circle.center.x)+(mousePoint.y - circle.center.y)*(mousePoint.y - circle.center.y));
-  if (distance <= circle.radius)
+  if (distance(circle.center, mousePoint) <= circle.radius)
     return true;
   else
     return false;
@@ -113,10 +112,10 @@ function updateV(circle, norm, length, inside) {
   var w = new vector(v.x - u.x, v.y - u.y);
   circle.vx = (w.x - u.x)*bounce;
   circle.vy = (w.y - u.y)*bounce;
-  /*if (inside) {
+  if (inside) {
     circle.vx = -circle.vx;
     circle.vy = -circle.vy;
-  }*/
+  }
 }
 
 function pushOut(cPoint, circle) {
