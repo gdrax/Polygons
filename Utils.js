@@ -18,6 +18,10 @@ function setColors(stroke, shadow, fill) {
     ctx.fillStyle = backgroundColor;
 }
 
+function rand(max, offset) {
+  return Math.floor(Math.random()*max) + offset;
+}
+
 /*
 Controlla se il mouse si trova nel rettangolo
 */
@@ -80,7 +84,7 @@ function drawDashLine(p1, p2, c) {
 Copia un poligono
 */
 function clonePolygon(p) {
-  var newP = new polygon(p.sides, p.size, new color(255, 255, 255), new color(255, 255, 255), p.rv, p.vx, p.vy, p.angle, p.speedBonus, p.doubleBall);
+  var newP = new polygon(p.center, p.sides, p.size, new color(255, 255, 255), new color(255, 255, 255), p.rv, p.vx, p.vy, p.angle, p.speedBonus, p.doubleBall);
   newP.strokeColor = p.strokeColor;
   newP.shadowColor = p.shadowColor;
   newP.rotation = p.rotation;

@@ -64,7 +64,7 @@ function roundRectangle(width, height, shadowColor) {
 /*
 Oggetto che rappresenta un poligono in movimeto
 */
-function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
+function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
 	this.sides = sides;
 	this.size = size;
 	this.strokeColor = strokeColor.makeColor(1);
@@ -77,8 +77,9 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
   this.vy = vy;
 	this.angle = angle;
   this.vertices = [];
+  this.center = center;
 
-	this.draw = function(center, shadows) {
+	this.draw = function(shadows) {
     setColors(this.strokeColor, this.shadowColor, null);
 	  if (shadows) {
 		  ctx.strokeStyle = this.shadowColor;
@@ -96,23 +97,23 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
 		ctx.stroke();
     //aggiorno rotazione e traslazione solo quando non disegno le ombre
     if (!shadows) {
-  		this.translationX += this.vx;
-      this.translationY += this.vy;
+  		this.center.x += this.vx;
+      this.center.y += this.vy;
     }
 	}
 
-	this.drawWithLights = function(center) {
+	this.drawWithLights = function() {
     for (var i=0; i<this.sides; i++) {
-      this.vertices[i] = new point(center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation) + this.translationX * Math.cos(this.angle),
-                                   center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation) + this.translationY * Math.sin(this.angle));
+      this.vertices[i] = new point(this.center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation),
+                                   this.center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation));
     }
     if (contains(this, mousePoint)) {
   		var s = this.size;
   		this.size = s+s/200;
-  		this.draw(center, true)
+  		this.draw(true)
   		this.size = s;
     }
-		this.draw(center, false);
+		this.draw(false);
 	}
 
   this.invertSpeed = function() {
@@ -124,7 +125,7 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
 /*
 Oggetto che modella un cerchio
 */
-function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
+  function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
   this.center = new point(center.x, center.y);
   this.radius = radius;
   this.strokeColor = strokeColor.makeColor(1);

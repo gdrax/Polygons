@@ -98,7 +98,6 @@
 			var placedPolygons = [];
 			var draggingBall = false;
 			var ballColliding = false;
-			var placedCenters = [];
 			var draggedPolygon = null;
 			var npp = 0;
 			var vIndex = -1;
@@ -136,8 +135,8 @@
 						if (oldState == "playing") {
 							for (var i=0; i<placedPolygons.length; i++) {
 								if (placedPolygons[i] != null) {
-									placedCenters[i].x = placedCenters[i].x*2/3 + canvas.width/6;
-									placedCenters[i].y = placedCenters[i].y*2/3 + canvas.height/6;
+									placedPolygons[i].center.x = placedPolygons[i].center.x*2/3 + canvas.width/6;
+									placedPolygons[i].center.y = placedPolygons[i].center.y*2/3 + canvas.height/6;
 									placedPolygons[i].size *= 2/3;
 								}
 							}
@@ -149,8 +148,8 @@
 					if (gameState == "playing") {
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								placedCenters[i].x = (placedCenters[i].x - canvas.width/6)*3/2;
-								placedCenters[i].y = (placedCenters[i].y - canvas.height/6)*3/2;
+								placedPolygons[i].center.x = (placedPolygons[i].center.x - canvas.width/6)*3/2;
+								placedPolygons[i].center.y = (placedPolygons[i].center.y - canvas.height/6)*3/2;
 								placedPolygons[i].size *= 3/2;
 							}
 						}
@@ -179,21 +178,23 @@
 				clearArea();
 				switch (gameState) {
 					case "opening":
-						polygons[0].drawWithLights(new point(canvas.width/10, canvas.width/10));
-						polygons[1].drawWithLights(new point(canvas.width/5, canvas.width/5));
+						polygons[0].drawWithLights();
+						polygons[1].drawWithLights();
 						bouncePolygons();
 						break;
 
 					case "editor":
 						for (var i=0; i<polygons.length; i++) {
-							polygons[i].drawWithLights(new point(canvas.width/12, canvas.height*(3+i)/9));
+							polygons[i].drawWithLights();
 						}
-						if (dragging)
-							draggedPolygon.drawWithLights(mousePoint);
+						if (dragging) {
+							draggedPolygon.center = mousePoint;
+							draggedPolygon.drawWithLights();
+						}
 						myBall.drawWithLights();
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (i != draggingIndex && placedPolygons[i] != null)
-								placedPolygons[i].drawWithLights(placedCenters[i]);
+								placedPolygons[i].drawWithLights();
 								result = detectCircleShapeCollision(myBall.center, myBall.radius, placedPolygons[i]);
 						}
 						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/6));
@@ -202,7 +203,7 @@
 					case "playing":
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
-								placedPolygons[i].drawWithLights(placedCenters[i]);
+								placedPolygons[i].drawWithLights();
 							}
 						}
 						myBall.drawWithLights();
@@ -229,16 +230,16 @@
 				switch (gameState) {
 					case "opening":
 						clearPolygons();
-						polygons[0] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, 1.5, 1.5, -0.2);
-						polygons[1] = new polygon(Math.floor(Math.random()*3)+3, Math.random()*20+30, new color(255, 255, 255),
-																			new color(50+Math.random()*205, 50+Math.random()*205, 50+Math.random()*205), 0, -1.5, -1.5, 0.5);
+						polygons[0] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
+																			new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, rand(2, 1), rand(1, 1), -0.2);
+						polygons[1] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
+																			new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, -rand(1, 1), -rand(2, 0), 0.5);
 						break;
 					case "editor":
 						clearPolygons();
 						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
 						for (var i=0; i<4; i++) {
-							polygons[i] = new polygon(3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0);
+							polygons[i] = new polygon(new point(canvas.width/12, canvas.height*(3+i)/9), 3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0);
 						}
 						myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						gravity = 0;
@@ -363,19 +364,18 @@
 							if (draggingIndex == -1) {
 								//sto trascianndo un nuovo poligono
 								placedPolygons[npp] = clonePolygon(draggedPolygon);
-								placedCenters[npp] = mousePoint;
+								placedPolygons[npp].center = mousePoint;
 								npp = findFreeSpot();
 							}
 							else {
 								//sto trascinando un poligono già piazzato
-								placedCenters[draggingIndex] = mousePoint;
+								placedPolygon[draggingIndex].center = mousePoint;
 								draggingIndex = -1;
 							}
 						}
 						//ho trascinato un poligono fuori dal rettangolo
 						else if (draggingIndex != -1) {
 							placedPolygons[draggingIndex] = null;
-							placedCenters[draggingIndex] = null;
 							npp = findFreeSpot();
 						}
 						draggedPolygon = null;
