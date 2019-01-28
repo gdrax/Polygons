@@ -398,10 +398,9 @@
 						shotPoint = mousePoint;
 						var vx = shotPoint.x - myBall.center.x;
 						var vy = shotPoint.y - myBall.center.y;
-						var v = new vector(shotPoint.x - myBall.center.x, shotPoint.y - myBall.center.y).normalize();
-						myBall.setSpeed(-v.x*30, -v.y*30);
+						myBall.setSpeed(-vx/5, -vy/5);
 						ballClicked = false;
-						gravity = 0;
+						gravity = 1;
 					}
 					myBall.line = false;
 				}
