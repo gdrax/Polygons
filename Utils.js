@@ -98,9 +98,10 @@ function findRelativeCoordinates(x, y) {
   var offsetX = x;
   var offsetY = y;
   var ele = canvas;
+  var i=0;
   while (ele) {
     offsetX -= ele.offsetLeft;
-    offsetX -= ele.offsetTop;
+    offsetY -= ele.offsetTop;
     ele = ele.offsetParent;
   }
   return new point(offsetX, offsetY);
