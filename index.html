@@ -32,7 +32,9 @@
 			var tryButton = document.querySelector(".tryButton");
 			hideButtons("editor");
 
-
+			/*
+			Nasconde i bottoni
+			*/
 			function hideButtons(gameState) {
 				if (gameState == "opening")
 					startButton.style.display='none';
@@ -42,6 +44,9 @@
 				}
 			}
 
+			/*
+			Mostra i bottoni
+			*/
 			function showButtons(gameState) {
 				if (gameState == "opening")
 					startButton.style.display='block';
@@ -51,6 +56,9 @@
 				}
 			}
 
+			/*
+			Imposta i listener e i bottoni per lo stato iniziale
+			*/
 			function setStartListener() {
 				startButton.addEventListener("click", function clickS(e) {
 					startButton.removeEventListener("click", clickS);
@@ -60,6 +68,9 @@
 				});
 			};
 
+			/*
+			Imposta i listener e i bottoni per lo stato dell'editor
+			*/
 			function setEditorListeners() {
 				backButton.addEventListener("click", function clickB(e) {
 					backButton.removeEventListener("click", clickB);
@@ -78,8 +89,12 @@
 				updateMouseCoordinates(event);
 			});
 
+			/*
+			Imposto il listener per la rotella del mouse
+			*/
 			window.addEventListener('wheel', function(event) {
 				for (var i=0; i<placedPolygons.length; i++) {
+					//se il mouse si trova all'interno di un poligono e la rotella si muove ne modifico la dimensione
 					if (placedPolygons[i] && contains(placedPolygons[i], mousePoint)) {
 						if (event.deltaY < 0 && placedPolygons[i].size >= 20) {
 							placedPolygons[i].size -= 5;
