@@ -108,28 +108,17 @@ function findRelativeCoordinates(x, y) {
 }
 
 /*
-Cambia le componenti velocità della palla al contatto con un poligono
+Aggiorna le componenti veloctà della pallina
 */
-function updateV(circle, norm, length, inside) {
+function updateV(circle, norm, cpoint) {
   var v = new vector(circle.vx, circle.vy);
-  var dp = norm.dotp(v)/(length * length);
-  var u = new vector(dp * norm.x, dp * norm.y);
-  var w = new vector(v.x - u.x, v.y - u.y);
-  circle.vx = (w.x - u.x)*bounce;
-  circle.vy = (w.y - u.y)*bounce;
-  if (inside) {
-    console.log("INS");
-    circle.vx = -circle.vx;
-    circle.vy = -circle.vy;
-  }
-}
-
-function pushOut(cPoint, circle) {
-  var v = new vector(circle.vx, circle.vy).normalize();
-  console.log(v);
-  var newCenter = new point(cPoint.x - (circle.radius+2)*v.x, cPoint.y - (circle.radius+2)*v.y);
-  circle.center = newCenter;
-  console.log(circle.center);
+  var n = norm.normalize();
+  var dp = v.dotp(n);
+  n.x *= -2*dp;
+  n.y *= -2*dp;
+  var newV = new vector(n.x + v.x, n.y + v.y);
+  circle.vx = newV.x;
+  circle.vy = newV.y;
 }
 
 /*

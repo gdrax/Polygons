@@ -56,10 +56,11 @@ function detectCircleShapeCollision(center, radius, shape) {
     if (d1+d2 < length - 20 || d1+d2 > length + 20) {
       continue;
     }
+    result.closestPoint = cPoint;
     if (distance(cPoint, center) <= radius) {
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
-      result.closestPoint = cPoint;
       result.overlaps = true;
+      break;
     }
   }
   if (contains(shape, center)) {

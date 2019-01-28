@@ -103,7 +103,7 @@
 			var backgroundColor = new color(30, 30, 30).makeColor(1);
 			var backgroundColor2 = new color(10, 10, 10).makeColor(1);
 			var gravity = 0;
-			var bounce = -0.9;
+			var bounce = -0.7;
 			var ballClicked = false;
 			var shotPoint = null;
 			var dragging = false;
@@ -212,10 +212,9 @@
 							if (placedPolygons[i] != null) {
 								result = detectCircleShapeCollision(nextCenter, myBall.radius, placedPolygons[i]);
 								if (result.overlaps == true) {
-									//if (result.p != null) {
-										//pushOut(result.closestPoint, myBall);
-										updateV(myBall, result.p, result.elength, result.isInside);
-									//}
+									if (result.p != null) {
+										updateV(myBall, result.p, result.closestPoint);
+									}
 								}
 							}
 						}
@@ -297,8 +296,6 @@
 			*/
 			function updateMouseCoordinates(event) {
 				mousePoint = findRelativeCoordinates(event.clientX, event.clientY);
-				console.log(mousePoint);
-				console.log(event.clientX, event.clientY);
 				if (gameState == "editor" && draggingBall) {
 					myBall.center = mousePoint;
 					for (var i=0; i<placedPolygons.length; i++) {
