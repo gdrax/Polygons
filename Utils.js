@@ -113,6 +113,7 @@ function updateV(circle, norm, length, inside) {
   circle.vx = (w.x - u.x)*bounce;
   circle.vy = (w.y - u.y)*bounce;
   if (inside) {
+    console.log("INS");
     circle.vx = -circle.vx;
     circle.vy = -circle.vy;
   }

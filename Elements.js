@@ -64,7 +64,7 @@ function roundRectangle(width, height, shadowColor) {
 /*
 Oggetto che rappresenta un poligono in movimeto
 */
-function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle, sB, dB) {
+function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
 	this.sides = sides;
 	this.size = size;
 	this.strokeColor = strokeColor.makeColor(1);
@@ -77,8 +77,6 @@ function polygon(sides, size, strokeColor, shadowColor, rv, vx, vy, angle, sB, d
   this.vy = vy;
 	this.angle = angle;
   this.vertices = [];
-  this.speedBonus = sB;
-  this.doubleBall = dB;
 
 	this.draw = function(center, shadows) {
     setColors(this.strokeColor, this.shadowColor, null);

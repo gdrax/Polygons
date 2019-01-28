@@ -39,7 +39,6 @@ function detectCircleShapeCollision(center, radius, shape) {
   };
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
-    console.log("ITER"+i);
     var v1 = shape.vertices[i];
     var v2 = shape.vertices[(i+1)%shape.vertices.length];
     //calcolo il vettore su cui si trova il lato, e lo normalizzo
@@ -52,20 +51,12 @@ function detectCircleShapeCollision(center, radius, shape) {
     //trovo le coordinate della proiezione del centro sul vettore
     var cPoint = new point(v1.x + dot * edge.x, v1.y + dot * edge.y);
     var showP = new ball(cPoint, 5, new color(255, 255, 255), new color(255, 255, 255), 0, 0).drawWithLights();
-    /*if (distance(v1, cPoint) + distance(v2, cPoint) > length) {
-      var dist = distance(v1, cPoint)+distance(v2, cPoint);
-      console.log("A"+dist);
-      console.log("B"+length);
-      continue;
-    }*/
-    var bigDot = dot * length*length;
-    console.log(bigDot);
-    console.log(circleVect);
-    if (bigDot < 0 || bigDot > edge.dotp(edge)) {
+    var d1 = distance(v1, cPoint);
+    var d2 = distance(v2, cPoint);
+    if (d1+d2 < length - 20 || d1+d2 > length + 20) {
       continue;
     }
     if (distance(cPoint, center) <= radius) {
-      console.log("<<<<<<<=====");
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
       result.closestPoint = cPoint;
       result.overlaps = true;
