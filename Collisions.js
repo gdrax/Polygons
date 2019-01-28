@@ -32,10 +32,7 @@ Determina se un cerchio e un poligono stanno collidendo
 function detectCircleShapeCollision(center, radius, shape) {
   var result = {
     overlaps: false,
-    p: null,
-    elength: 0,
-    isInside: false,
-    closestPoint: null
+    p: null
   };
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
@@ -56,20 +53,17 @@ function detectCircleShapeCollision(center, radius, shape) {
     if (d1+d2 < length - 20 || d1+d2 > length + 20) {
       continue;
     }
-    result.closestPoint = cPoint;
     if (distance(cPoint, center) <= radius) {
       //se si trova all'interno del lato del poligono e la distanza è minore del raggio c'è collisione
       result.overlaps = true;
       break;
     }
   }
+  //se il centro si trova all'interno del poligono c'è collisione
   if (contains(shape, center)) {
-    console.log("INSIDE");
     result.overlaps = true;
-    result.isInside = true;
   }
   result.p = edge.perp();
-  result.elength = length;
   return result;
 }
 
@@ -198,16 +192,18 @@ function vector(x, y) {
     return new vector(-this.y, this.x);
   }
 
-  //calcola il prodotto scalare
+  //calcola il prodotto scalare con il vettore p
   this.dotp = function(p) {
     return this.x * p.x + this.y * p.y;
   }
 
+  //restituisce il vettore inverso
   this.inverse = function() {
     return new vector(-this.x, -this.y);
   }
 
-  this.normalize = function() {
+  //normalizza il vettore
+    this.normalize = function() {
     var div = Math.sqrt(this.x * this.x + this.y * this.y);
     return new vector(this.x/div, this.y/div);
   }

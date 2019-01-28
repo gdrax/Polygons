@@ -8,7 +8,7 @@
 <body>
 	<div class="container" style="background-color: #333333">
 
-		<canvas id="canvas" width="900" height="600" onkeydown="keyPressed(event)" onclick="mouseClick()" onmousedown="mouseDown()" onmouseup="mouseUp()">
+		<canvas id="canvas" width="900" height="600" onkeydown="keyPressed(event)" onmousedown="mouseDown()" onmouseup="mouseUp()">
 		</canvas>
 		<button class="startButton" id="startButton">
 			<div class="startText" id="startText">Start</div>
@@ -92,28 +92,26 @@
 			});
 
 			var mousePoint = new point(0, 0); //conterrà la posizione del mouse
-			var gameState = null;	//stato del gioco
-			var keyPressed;
-			var choosedPolygon = null;
-			var rectangleEditor = null;
-			var polygons = [];
-			var myBall = null;
-			var myBallCenter = new point(canvas.width*11/12, canvas.height/2);
-			var animation = null;
-			var backgroundColor = new color(30, 30, 30).makeColor(1);
-			var backgroundColor2 = new color(10, 10, 10).makeColor(1);
-			var gravity = 0;
-			var bounce = -0.7;
-			var ballClicked = false;
-			var shotPoint = null;
-			var dragging = false;
-			var draggingIndex = -1;
-			var placedPolygons = [];
-			var draggingBall = false;
-			var ballColliding = false;
-			var draggedPolygon = null;
-			var npp = 0;
-			var vIndex = -1;
+			var gameState = null;							//stato del gioco
+			var keyPressed;										//codice dell'ulitmo tasto premuto
+			var rectangleEditor = null;				//rettangolo nel quale posizionare i poligoni
+			var polygons = [];								//array dei poligoni
+			var myBall = null;								//pallina
+			var myBallCenter = new point(canvas.width*11/12, canvas.height/2);	//centro della pallina
+			var animation = null;							//ID del timer delle animazioni
+			var backgroundColor = new color(30, 30, 30).makeColor(1);						//colore di fondo all'interno degli oggetti
+			var backgroundColor2 = new color(10, 10, 10).makeColor(1);					//colore di fondo del canvas
+			var gravity = 0;									//gravità da applicare alla pallina
+			var bounce = -0.7;								//coefficiente di rimbalzo
+			var ballClicked = false;					//vero se la pallina è stata clickata
+			var shotPoint = null;							//punto di lancio della pallina (dove viene rilasciato il mouse)
+			var dragging = false;							//vero se un poligono sta venendo trascinato
+			var draggingIndex = -1;						//indice del poligono che sta venendo trascinato
+			var placedPolygons = [];					//array dei poligoni piazzati
+			var draggingBall = false;					//vero se si sta trscinando la pallina
+			var ballColliding = false;				//vero se la pallina sta collidendo con un poligono
+			var draggedPolygon = null;				//poligono trascinato
+			var npp = 0;											//la prima posizione libera nell'array dei poligoni piazzati
 
 			clearArea();
 			//imposto primo stato di gioco
@@ -132,6 +130,7 @@
 						setStartListener();
 					}
 					if (gameState == "editor") {
+						//se vengo dallo stato playing trasformo gli oggetti per mostrarli nel rettangolo
 						if (oldState == "playing") {
 							for (var i=0; i<placedPolygons.length; i++) {
 								if (placedPolygons[i] != null) {
@@ -142,10 +141,12 @@
 							}
 							myBallCenter = myBall.center;
 						}
+						//imposto i listener e mostro i bottoni
 						setEditorListeners();
 						showButtons("editor");
 					}
 					if (gameState == "playing") {
+						//se entro nello stato playing trasformo tutti gli oggetti per mostrarli nell'intero canvas
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
 								placedPolygons[i].center.x = (placedPolygons[i].center.x - canvas.width/6)*3/2;
@@ -157,7 +158,7 @@
 						myBall.center.y = (myBall.center.y - canvas.height/6)*3/2;
 					}
 				}
-				//disegna gli oggetti
+				//avvia il timer delle animazioni
 				startAnimation();
 				}
 
@@ -180,40 +181,47 @@
 					case "opening":
 						polygons[0].drawWithLights();
 						polygons[1].drawWithLights();
+						//applico rimbalzi con i bordi
 						bouncePolygons();
 						break;
 
 					case "editor":
+						//disegno i poligoni per l'editor
 						for (var i=0; i<polygons.length; i++) {
 							polygons[i].drawWithLights();
 						}
+						//se c'è disegno il poligono trascinato
 						if (dragging) {
 							draggedPolygon.center = mousePoint;
 							draggedPolygon.drawWithLights();
 						}
 						myBall.drawWithLights();
+						//disegno i poligoni piazzati
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (i != draggingIndex && placedPolygons[i] != null)
 								placedPolygons[i].drawWithLights();
-								result = detectCircleShapeCollision(myBall.center, myBall.radius, placedPolygons[i]);
 						}
+						//disegno il rettangolo dell'editor
 						rectangleEditor.drawWithLights(new point(canvas.width/6, canvas.height/6));
 						break;
 
 					case "playing":
+						//disegno i poligonoi piazzati e la pallina
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
 								placedPolygons[i].drawWithLights();
 							}
 						}
 						myBall.drawWithLights();
+						//calcolo le coordinate del prossimo centro della pallina
 						var nextCenter = new point(myBall.center.x + myBall.vx, myBall.center.y + myBall.vy);
 						for (var i=0; i<placedPolygons.length; i++) {
 							if (placedPolygons[i] != null) {
 								result = detectCircleShapeCollision(nextCenter, myBall.radius, placedPolygons[i]);
+								//se c'è collisione modifico la velocità della pallina di conseguenza
 								if (result.overlaps == true) {
 									if (result.p != null) {
-										updateV(myBall, result.p, result.closestPoint);
+										updateV(myBall, result.p);
 									}
 								}
 							}
@@ -229,11 +237,13 @@
 				switch (gameState) {
 					case "opening":
 						clearPolygons();
+						//creo alcuni poligoni con coodinate, numero di lati, dimensioni e colori casuali
 						polygons[0] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
 																			new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, rand(2, 1), rand(1, 1), -0.2);
 						polygons[1] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
 																			new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, -rand(1, 1), -rand(2, 0), 0.5);
 						break;
+
 					case "editor":
 						clearPolygons();
 						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
@@ -242,17 +252,16 @@
 						}
 						myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						gravity = 0;
+						break;
 
-						break;
-					case "playing":
-						clearPolygons();
-						myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
-						break;
+						case "playing":
+							myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
+							break;
 				}
 			}
 
 			/*
-			avvia le animazioni
+			imposta il timer delle animazioni
 			*/
 			function startAnimation() {
 				clearInterval(animation);
@@ -275,16 +284,17 @@
 			function keyPressed(event) {
 				key = event.keyCode;
 				if (gameState == "playing") {
-					if (key == 27) {
+					if (key == 27) { //ESC
 						changeGameState("editor");
 					}
 				}
 				if (gameState == "editor") {
 					for (var i=0; i<placedPolygons.length; i++) {
+						//se il mouse è all'interno di un poligono posso ruotare il poligono con le frecce
 						if (placedPolygons[i] != null && contains(placedPolygons[i], mousePoint)) {
-							if (key == 37)
+							if (key == 37) //freccia a sinistra
 								placedPolygons[i].rotation += Math.PI/12;
-							if (key == 39)
+							if (key == 39) //freccia a destra
 								placedPolygons[i].rotation -= Math.PI/12;
 						}
 					}
@@ -295,9 +305,12 @@
 			aggiorna la posizione del muose quando si muove
 			*/
 			function updateMouseCoordinates(event) {
+				//trovo le coordinate del mouse relative al canvas
 				mousePoint = findRelativeCoordinates(event.clientX, event.clientY);
 				if (gameState == "editor" && draggingBall) {
+					//muovo la pallina insieme al mouse se la sto trascinando
 					myBall.center = mousePoint;
+					//cambio il colore della pallina in blu se sta collidendo con un poligono
 					for (var i=0; i<placedPolygons.length; i++) {
 						if (placedPolygons[i] != null && detectCircleShapeCollision(myBall.center, myBall.radius, placedPolygons[i]).overlaps == true) {
 							myBall.changeShadowColor(new color(0, 0, 255));
@@ -313,28 +326,11 @@
 			}
 
 			/*
-			Gestisce l'evento mouseClick
+			chiamata all'abbassamento del mouse
 			*/
-			function mouseClick() {
-				switch(gameState) {
-					case "editor":
-					 for(var i=0; i<placedPolygons.length; i++) {
-						 if ( placedPolygons[i] != null && contains(placedPolygons[i], mousePoint)) {
-							 choosedPolygon = clonePolygon(placedPolygons[i]);
-						 }
-					 }
-					break;
-				}
-			}
-
 			function mouseDown() {
-				if (gameState == "playing") {
-					if (mouseInCircle(myBall)) {
-						ballClicked = true;
-					}
-					myBall.line = true;
-				}
 				if (gameState == "editor") {
+					//se clicco un poligono lo clono e inizio a spostarlo
 					for (var i=0; i<polygons.length; i++) {
 						if (contains(polygons[i], mousePoint)) {
 							dragging = true;
@@ -343,6 +339,7 @@
 							break;
 						}
 					}
+					//se clicco un poligono piazzato o la pallina li sposto
 					for (var i=0; i<placedPolygons.length; i++) {
 						if (placedPolygons[i] && contains(placedPolygons[i], mousePoint)) {
 							dragging = true;
@@ -354,11 +351,22 @@
 						draggingBall = true;
 					}
 				}
+
+				if (gameState == "playing") {
+					if (mouseInCircle(myBall)) {
+						ballClicked = true;
+					}
+					myBall.line = true;
+				}
 			}
 
+			/*
+			chiamata al rilascio del mouse
+			*/
 			function mouseUp() {
 				if (gameState == "editor") {
 					if (dragging) {
+						//se mi trovo all'interno del rettangolo dell'editor piazzo il poligono
 						if (mouseInRectangle(rectangleEditor)) {
 							if (draggingIndex == -1) {
 								//sto trascianndo un nuovo poligono
@@ -381,16 +389,18 @@
 						dragging = false;
 					}
 					if (draggingBall) {
+						//se rilascio la pallina fuori dal rettangolo o mentre collide con un poligono, la rimetto al suo posto iniziale
 						if (!mouseInRectangle(rectangleEditor, mousePoint) || ballColliding) {
 							myBall.center = new point(canvas.width*11/12, canvas.height/2);
-
 							myBall.changeShadowColor(new color(0, 255, 0));
 						}
 						myBallCenter = myBall.center;
 						draggingBall = false;
 					}
 				}
+
 				if (gameState == "playing") {
+					//se stavo lanciando la pallina, calcolo le componenti della velocità e lancio la pallina
 					if (ballClicked == true) {
 						shotPoint = mousePoint;
 						var vx = shotPoint.x - myBall.center.x;
@@ -403,11 +413,17 @@
 				}
 			}
 
+			/*
+			svuota l'array dei poligoni
+			*/
 			function clearPolygons() {
 				polygons = null;
 				polygons = [];
 			}
 
+			/*
+			Trova il primo posto libero nell'array dei poligoni piazzati
+			*/
 			function findFreeSpot() {
 				place = -1;
 				for (var i=0; i<placedPolygons.length; i++) {

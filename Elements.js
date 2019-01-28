@@ -115,11 +115,6 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
     }
 		this.draw(false);
 	}
-
-  this.invertSpeed = function() {
-    this.vx = -this.vx;
-    this.vy = -this.vy;
-  }
 }
 
 /*
@@ -168,12 +163,14 @@ Oggetto che modella un cerchio
     this.move();
   }
 
+  //sposta il centro di un passo
   this.move = function() {
     this.center.x += this.vx;
     this.center.y += this.vy;
     this.vy += gravity;
   }
 
+  //modifica le componenti velocità se c'è un urto con un bordo
   this.borderBounce = function() {
     var nextCenter = new point(this.center.x + this.vx, this.center.y + this.vy);
     if (nextCenter.x + this.radius >= canvas.width || nextCenter.x - this.radius <= 0)
@@ -182,11 +179,13 @@ Oggetto che modella un cerchio
       this.vy *= bounce;
   }
 
+  //imposta nuove componenti velocità
   this.setSpeed = function(vx, vy) {
     this.vx = vx;
     this.vy = vy;
   }
 
+  //cambia il colore dell'ombra
   this.changeShadowColor = function(newShadowColor) {
     this.shadowColor = newShadowColor.makeColor(1);
   }

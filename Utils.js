@@ -18,6 +18,9 @@ function setColors(stroke, shadow, fill) {
     ctx.fillStyle = backgroundColor;
 }
 
+/*
+genera un numero random nell'intervallo (offset, offset+max]
+*/
 function rand(max, offset) {
   return Math.floor(Math.random()*max) + offset;
 }
@@ -50,21 +53,18 @@ function bouncePolygons() {
     for (var j=0; j<polygons[i].vertices.length; j++) {
       var x = polygons[i].vertices[j].x;
       var y = polygons[i].vertices[j].y;
+      //urto una parete verticale inverto la componente x
       if (x + polygons[i].vx >= canvas.width || x + polygons[i].vx <= 0) {
         polygons[i].vx = -polygons[i].vx;
         break;
       }
+      //urto una parete orizzontale inverto la componente y
       if (y + polygons[i].vy >= canvas.height || y + polygons[i].vy <= 0) {
         polygons[i].vy = -polygons[i].vy;
         break;
       }
     }
   }
-}
-
-function applyBonus(ball, poly) {
-  ball.vx *= poly.speedBonus;
-  ball.vy *= poly.speedBonus;
 }
 
 /*
@@ -110,7 +110,7 @@ function findRelativeCoordinates(x, y) {
 /*
 Aggiorna le componenti veloctà della pallina
 */
-function updateV(circle, norm, cpoint) {
+function updateV(circle, norm) {
   var v = new vector(circle.vx, circle.vy);
   var n = norm.normalize();
   var dp = v.dotp(n);
