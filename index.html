@@ -131,6 +131,7 @@
 			var ballColliding = false;				//vero se la pallina sta collidendo con un poligono
 			var draggedPolygon = null;				//poligono trascinato
 			var npp = 0;											//la prima posizione libera nell'array dei poligoni piazzati
+			var paused = false;								//se il gioco è in pausa
 
 			clearArea();
 			//imposto primo stato di gioco
@@ -158,7 +159,9 @@
 									placedPolygons[i].size *= 2/3;
 								}
 							}
-							myBallCenter = myBall.center;
+							myBallCenter.x = myBallCenter.x*2/3 + canvas.width/6;
+							myBallCenter.y = myBallCenter.y*2/3 + canvas.height/6;
+							myBall.center = new point(myBallCenter.x, myBallCenter.y);
 						}
 						//imposto i listener e mostro i bottoni
 						setEditorListeners();
@@ -173,8 +176,9 @@
 								placedPolygons[i].size *= 3/2;
 							}
 						}
-						myBall.center.x = (myBall.center.x - canvas.width/6)*3/2;
-						myBall.center.y = (myBall.center.y - canvas.height/6)*3/2;
+						myBallCenter.x = (myBallCenter.x - canvas.width/6)*3/2;
+						myBallCenter.y = (myBallCenter.y - canvas.height/6)*3/2;
+						myBall.center = new point(myBallCenter.x, myBallCenter.y);
 					}
 				}
 				//avvia il timer delle animazioni
@@ -306,6 +310,24 @@
 					if (key == 27) { //ESC
 						changeGameState("editor");
 					}
+					if (key == 32) { //SPACEBAR
+						if (paused) {
+							paused = false;
+							animation = setInterval(drawArea, 20);
+						}
+						else {
+							paused = true;
+							clearInterval(animation);
+						}
+					}
+					if (key == 82) { //lettera r
+						if (!paused) {
+							myBall.center = new point(myBallCenter.x, myBallCenter.y);
+							myBall.vx = 0;
+							myBall.vy = 0;
+							gravity = 0;
+						}
+					}
 				}
 				if (gameState == "editor") {
 					for (var i=0; i<placedPolygons.length; i++) {
@@ -410,12 +432,15 @@
 					if (draggingBall) {
 						//se rilascio la pallina fuori dal rettangolo o mentre collide con un poligono, la rimetto al suo posto iniziale
 						if (!mouseInRectangle(rectangleEditor, mousePoint) || ballColliding) {
+							//riporto la pallina al suo posto
 							myBall.center = new point(canvas.width*11/12, canvas.height/2);
 							myBall.changeShadowColor(new color(0, 255, 0));
 						}
+						//mi salvo la posizione della pallina
 						myBallCenter = myBall.center;
 						draggingBall = false;
 					}
+
 				}
 
 				if (gameState == "playing") {
