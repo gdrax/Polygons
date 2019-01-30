@@ -8,7 +8,7 @@
 <body>
 	<div class="container" style="background-color: #333333">
 
-		<canvas id="canvas" width="900" height="600" onkeydown="keyPressed(event)" onmousedown="mouseDown()" onmouseup="mouseUp()">
+		<canvas id="canvas" width="900" height="600" onkeydown="keyPressed(event)" onmousedown="mouseDown()">
 		</canvas>
 		<button class="startButton" id="startButton">
 			<div class="startText" id="startText">Start</div>
@@ -85,8 +85,12 @@
 				});
 			};
 
-			canvas.addEventListener("mousemove", function mouseMove(event) {
+			window.addEventListener("mousemove", function mouseMove(event) {
 				updateMouseCoordinates(event);
+			});
+
+			window.addEventListener("mouseup", function up() {
+				mouseUp();
 			});
 
 			/*
