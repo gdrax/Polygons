@@ -78,6 +78,7 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
 	this.angle = angle;
   this.vertices = [];
   this.center = center;
+  this.effect = 0;
 
 	this.draw = function(shadows) {
     setColors(this.strokeColor, this.shadowColor, null);
@@ -97,16 +98,35 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
 		ctx.stroke();
     //aggiorno rotazione e traslazione solo quando non disegno le ombre
     if (!shadows) {
+      ctx.lineWidth = 7;
+      if (this.effect > 0) {
+        var effectVertices = getVertices(this.center, this.effect, this.sides, this.rotation);
+        ctx.beginPath();
+        ctx.moveTo(effectVertices[0].x, effectVertices[0].y);
+        for (var i=1; i<this.sides; i++)
+          ctx.lineTo(effectVertices[i].x, effectVertices[i].y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        this.effect -= 4;
+        var effectVertices = getVertices(this.center, this.effect, this.sides, this.rotation);
+        ctx.beginPath();
+        ctx.moveTo(effectVertices[0].x, effectVertices[0].y);
+        for (var i=1; i<this.sides; i++)
+          ctx.lineTo(effectVertices[i].x, effectVertices[i].y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        this.effect -= 4;
+      }
+      ctx.lineWidth = 1;
   		this.center.x += this.vx;
       this.center.y += this.vy;
     }
 	}
 
 	this.drawWithLights = function() {
-    for (var i=0; i<this.sides; i++) {
-      this.vertices[i] = new point(this.center.x + this.size * Math.cos(i * 2 * Math.PI / this.sides + this.rotation),
-                                   this.center.y + this.size * Math.sin(i * 2 * Math.PI / this.sides + this.rotation));
-    }
+    this.vertices = getVertices(this.center, this.size, this.sides, this.rotation);
     if (contains(this, mousePoint)) {
   		var s = this.size;
   		this.size = s+s/200;

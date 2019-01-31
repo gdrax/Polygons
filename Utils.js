@@ -110,7 +110,11 @@ function findRelativeCoordinates(x, y) {
 /*
 Aggiorna le componenti veloctà della pallina
 */
-function updateV(circle, norm) {
+function updateV(circle, norm, isInside) {
+  if (isInside) {
+    circle.center.x -= circle.vx;
+    circle.center.y -= circle.vy;
+  }
   var v = new vector(circle.vx, circle.vy);
   var n = norm.normalize();
   var dp = v.dotp(n);
@@ -119,6 +123,11 @@ function updateV(circle, norm) {
   var newV = new vector(n.x + v.x, n.y + v.y);
   circle.vx = newV.x;
   circle.vy = newV.y;
+  if (isInside) {
+    console.log("INSIDE");
+    //circle.vx*=-1;
+    //circle.vy*=-1;
+  }
 }
 
 /*
@@ -128,4 +137,13 @@ function drawTargetLine(circle) {
   v = circle.center.subtract(mousePoint);
   oppositePoint = new point(circle.center.x - v.x, circle.center.y - v.y);
   drawDashLine(oppositePoint, circle.center, new color(255, 255, 255));
+}
+
+function getVertices(center, size, sides, rotation) {
+  var vertices = [];
+  for (var i=0; i<sides; i++) {
+    vertices[i] = new point(center.x + size * Math.cos(i * 2 * Math.PI / sides + rotation),
+                            center.y + size * Math.sin(i * 2 * Math.PI / sides + rotation));
+  }
+  return vertices;
 }

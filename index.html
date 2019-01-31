@@ -243,8 +243,9 @@
 								result = detectCircleShapeCollision(nextCenter, myBall.radius, placedPolygons[i]);
 								//se c'è collisione modifico la velocità della pallina di conseguenza
 								if (result.overlaps == true) {
+									placedPolygons[i].effect = placedPolygons[i].size;
 									if (result.p != null) {
-										updateV(myBall, result.p);
+										updateV(myBall, result.p, result.isInside);
 									}
 								}
 							}

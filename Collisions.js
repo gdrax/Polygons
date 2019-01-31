@@ -32,7 +32,8 @@ Determina se un cerchio e un poligono stanno collidendo
 function detectCircleShapeCollision(center, radius, shape) {
   var result = {
     overlaps: false,
-    p: null
+    p: null,
+    isInside: false
   };
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {
@@ -62,6 +63,7 @@ function detectCircleShapeCollision(center, radius, shape) {
   //se il centro si trova all'interno del poligono c'è collisione
   if (contains(shape, center)) {
     result.overlaps = true;
+    result.isInside = true;
   }
   result.p = edge.perp();
   return result;
