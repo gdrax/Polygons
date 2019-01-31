@@ -112,8 +112,8 @@ Aggiorna le componenti veloctà della pallina
 */
 function updateV(circle, norm, isInside) {
   if (isInside) {
-    circle.center.x -= circle.vx;
-    circle.center.y -= circle.vy;
+    circle.center.x -= circle.vx*2;
+    circle.center.y -= circle.vy*2;
   }
   var v = new vector(circle.vx, circle.vy);
   var n = norm.normalize();
@@ -125,8 +125,6 @@ function updateV(circle, norm, isInside) {
   circle.vy = newV.y;
   if (isInside) {
     console.log("INSIDE");
-    //circle.vx*=-1;
-    //circle.vy*=-1;
   }
 }
 
