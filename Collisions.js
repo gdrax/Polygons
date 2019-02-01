@@ -33,7 +33,8 @@ function detectCircleShapeCollision(center, radius, shape) {
   var result = {
     overlaps: false,
     p: null,
-    isInside: false
+    isInside: false,
+    closestPoint: null
   };
   //ciclo su tutti i lati del poligono
   for (var i=0; i<shape.vertices.length; i++) {

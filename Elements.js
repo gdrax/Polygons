@@ -193,10 +193,14 @@ Oggetto che modella un cerchio
   //modifica le componenti velocità se c'è un urto con un bordo
   this.borderBounce = function() {
     var nextCenter = new point(this.center.x + this.vx, this.center.y + this.vy);
-    if (nextCenter.x + this.radius >= canvas.width || nextCenter.x - this.radius <= 0)
+    if (nextCenter.x + this.radius >= canvas.width || nextCenter.x - this.radius <= 0) {
+      this.center.x = nextCenter.x > canvas.width/2 ? canvas.width - this.radius : this.radius;
       this.vx *= bounce;
-    if (nextCenter.y + this.radius >= canvas.height || nextCenter.y - this.radius <= 0)
+    }
+    if (nextCenter.y + this.radius >= canvas.height || nextCenter.y - this.radius <= 0) {
+      this.center.y = nextCenter.y > canvas.height/2 ? canvas.height - this.radius : this.radius;
       this.vy *= bounce;
+    }
   }
 
   //imposta nuove componenti velocità
