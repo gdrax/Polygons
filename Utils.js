@@ -145,3 +145,20 @@ function getVertices(center, size, sides, rotation) {
   }
   return vertices;
 }
+
+function polygonColor(index) {
+  switch(index) {
+    case 0:
+      return new color(255, 255, 0);
+      break;
+    case 1:
+      return new color(255, 0, 255);
+      break;
+    case 2:
+      return new color(0, 0, 255);
+      break;
+    case 3:
+      return new color(255, 125, 0);
+      break;
+  }
+}

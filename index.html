@@ -270,16 +270,16 @@
 
 					case "editor":
 						clearPolygons();
-						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(255, 0, 0));
+						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(0, 255, 0));
 						for (var i=0; i<4; i++) {
-							polygons[i] = new polygon(new point(canvas.width/12, canvas.height*(3+i)/9), 3+i, 30, new color(255, 255, 255), new color(255, 0, 255), Math.PI*3/2, 0, 0, 0);
+							polygons[i] = new polygon(new point(canvas.width/12, canvas.height*(3+i)/9), 3+i, 30, new color(255, 255, 255), polygonColor(i), Math.PI*3/2, 0, 0, 0);
 						}
-						myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
+						myBall = new ball(myBallCenter, 10, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						gravity = 0;
 						break;
 
 						case "playing":
-							myBall = new ball(myBallCenter, 15, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
+							myBall = new ball(myBallCenter, 10, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 							break;
 				}
 			}
