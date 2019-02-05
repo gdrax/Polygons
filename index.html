@@ -202,8 +202,9 @@
 				clearArea();
 				switch (gameState) {
 					case "opening":
-						polygons[0].drawWithLights();
-						polygons[1].drawWithLights();
+						for (var i=0; i<polygons.length; i++) {
+							polygons[i].drawWithLights();
+						}
 						//applico rimbalzi con i bordi
 						bouncePolygons();
 						break;
@@ -262,10 +263,11 @@
 					case "opening":
 						clearPolygons();
 						//creo alcuni poligoni con coodinate, numero di lati, dimensioni e colori casuali
-						polygons[0] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
-																			new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, rand(2, 1), rand(1, 1), -0.2);
-						polygons[1] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
-																			new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, -rand(1, 1), -rand(2, 0), 0.5);
+						for (var i=0; i<4; i++) {
+							polygons[i] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
+																				new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, rand(0, 0)*rand(2, 1), rand(0, 0)*rand(1, 1), -0.2);
+							polygons[i].effect2 = polygons[i].size;
+						}
 						break;
 
 					case "editor":

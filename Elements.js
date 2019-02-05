@@ -79,6 +79,7 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
   this.vertices = [];
   this.center = center;
   this.effect = 0;
+  this.effect2 = 0;
 
 	this.draw = function(shadows) {
     setColors(this.strokeColor, this.shadowColor, null);

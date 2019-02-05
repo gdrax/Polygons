@@ -22,6 +22,8 @@ function setColors(stroke, shadow, fill) {
 genera un numero random nell'intervallo (offset, offset+max]
 */
 function rand(max, offset) {
+  if (max == 0 && offset == 0)
+    return Math.random() > 0.5 ? 1: -1;
   return Math.floor(Math.random()*max) + offset;
 }
 
