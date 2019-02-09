@@ -1,5 +1,5 @@
 /*
-Oggetto che rappresenta un rettangolo con gli angoli arrotondati
+Rappresenta un rettangolo con gli angoli arrotondati
 */
 function roundRectangle(width, height, shadowColor) {
   this.width = width;
@@ -62,7 +62,7 @@ function roundRectangle(width, height, shadowColor) {
 }
 
 /*
-Oggetto che rappresenta un poligono in movimeto
+Rappresenta un poligono in movimeto
 */
 function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angle) {
 	this.sides = sides;
@@ -80,6 +80,7 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
   this.center = center;
   this.effect = 0;
   this.effect2 = 0;
+  this.effect2Time = 0;
 
 	this.draw = function(shadows) {
     setColors(this.strokeColor, this.shadowColor, null);
@@ -88,42 +89,59 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
       ctx.fillStyle = this.shadowColor;
     }
 	  else
-		  ctx.strokeStyle = this.strokeColor;
-		ctx.beginPath();
-
-		ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
-		for (var i=1; i<this.sides; i++)
-			ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
-		ctx.closePath();
-    ctx.fill();
-		ctx.stroke();
-    //aggiorno rotazione e traslazione solo quando non disegno le ombre
-    if (!shadows) {
-      ctx.lineWidth = 7;
-      if (this.effect > 0) {
-        var effectVertices = getVertices(this.center, this.effect, this.sides, this.rotation);
+      ctx.strokeStyle = this.strokeColor;
+      
+    if (this.effect2Time > 0) {
+      for (var i=0; i<this.sides; i++) {
+        v1 = this.vertices[i];
+        v2 = this.vertices[(i+1)%this.vertices.length]
+        var endX = this.effect2Time / this.effect2 * v1.x + (1 - this.effect2Time / this.effect2) * v2.x;
+        var endY = this.effect2Time / this.effect2 * v1.y + (1 - this.effect2Time / this.effect2) * v2.y;
         ctx.beginPath();
-        ctx.moveTo(effectVertices[0].x, effectVertices[0].y);
-        for (var i=1; i<this.sides; i++)
-          ctx.lineTo(effectVertices[i].x, effectVertices[i].y);
+        ctx.moveTo(this.vertices[i].x, this.vertices[i].y);
+        ctx.lineTo(endX, endY);
         ctx.closePath();
-        ctx.fill();
         ctx.stroke();
-        this.effect -= 4;
-        var effectVertices = getVertices(this.center, this.effect, this.sides, this.rotation);
-        ctx.beginPath();
-        ctx.moveTo(effectVertices[0].x, effectVertices[0].y);
-        for (var i=1; i<this.sides; i++)
-          ctx.lineTo(effectVertices[i].x, effectVertices[i].y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        this.effect -= 4;
+        this.effect2Time --;
       }
-      ctx.lineWidth = 1;
-  		this.center.x += this.vx;
-      this.center.y += this.vy;
     }
+    else {
+      ctx.beginPath();
+
+      ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
+      for (var i=1; i<this.sides; i++)
+        ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      //aggiorno rotazione e traslazione solo quando non disegno le ombre
+      if (!shadows) {
+        ctx.lineWidth = 7;
+        if (this.effect > 0) {
+          var effectVertices = getVertices(this.center, this.effect, this.sides, this.rotation);
+          ctx.beginPath();
+          ctx.moveTo(effectVertices[0].x, effectVertices[0].y);
+          for (var i=1; i<this.sides; i++)
+            ctx.lineTo(effectVertices[i].x, effectVertices[i].y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          this.effect -= 4;
+          var effectVertices = getVertices(this.center, this.effect, this.sides, this.rotation);
+          ctx.beginPath();
+          ctx.moveTo(effectVertices[0].x, effectVertices[0].y);
+          for (var i=1; i<this.sides; i++)
+            ctx.lineTo(effectVertices[i].x, effectVertices[i].y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          this.effect -= 4;
+        }
+        ctx.lineWidth = 1;
+      }
+    }
+    this.center.x += this.vx;
+    this.center.y += this.vy;
 	}
 
 	this.drawWithLights = function() {
@@ -135,13 +153,15 @@ function polygon(center, sides, size, strokeColor, shadowColor, rv, vx, vy, angl
   		this.size = s;
     }
 		this.draw(false);
-	}
+  }
+  
+  this.setEffect2 = function(e) {
+    this.effect2 = e;
+    this.effect2Time = e;
+  }
 }
 
-/*
-Oggetto che modella un cerchio
-*/
-  function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
+function ball(center, radius, strokeColor, shadowColor, initialVx, initialVy) {
   this.center = new point(center.x, center.y);
   this.radius = radius;
   this.strokeColor = strokeColor.makeColor(1);
@@ -229,7 +249,7 @@ function point(x, y) {
 }
 
 /*
-oggetto per generare colori
+per generare colori
 */
 function color(red, green, blue) {
 	this.red = red;

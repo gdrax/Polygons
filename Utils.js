@@ -123,8 +123,8 @@ function updateV(circle, norm, isInside) {
   n.x *= -2*dp;
   n.y *= -2*dp;
   var newV = new vector(n.x + v.x, n.y + v.y);
-  circle.vx = newV.x;
-  circle.vy = newV.y;
+  circle.vx = newV.x * poly_bounce;
+  circle.vy = newV.y * poly_bounce;
   if (isInside) {
     console.log("INSIDE");
   }
@@ -139,6 +139,9 @@ function drawTargetLine(circle) {
   drawDashLine(oppositePoint, circle.center, new color(255, 255, 255));
 }
 
+/*
+Calcola i vertici di un poligono
+*/
 function getVertices(center, size, sides, rotation) {
   var vertices = [];
   for (var i=0; i<sides; i++) {
@@ -148,6 +151,9 @@ function getVertices(center, size, sides, rotation) {
   return vertices;
 }
 
+/*
+Colori dei poligoni dell'editor
+*/
 function polygonColor(index) {
   switch(index) {
     case 0:

@@ -122,6 +122,7 @@
 			var backgroundColor2 = new color(10, 10, 10).makeColor(1);					//colore di fondo del canvas
 			var gravity = 0;									//gravità da applicare alla pallina
 			var bounce = -0.7;								//coefficiente di rimbalzo
+			var poly_bounce = 0.9;							//coefficiente di rimbalzo sui poligoni
 			var ballClicked = false;					//vero se la pallina è stata clickata
 			var shotPoint = null;							//punto di lancio della pallina (dove viene rilasciato il mouse)
 			var dragging = false;							//vero se un poligono sta venendo trascinato
@@ -266,7 +267,7 @@
 						for (var i=0; i<4; i++) {
 							polygons[i] = new polygon(new point(rand(canvas.width - 300, 150), rand(canvas.height - 300, 150)), rand(3, 3), rand(20, 30), new color(255, 255, 255),
 																				new color(rand(205, 50), rand(205, 50), rand(205, 50)), 0, rand(0, 0)*rand(2, 1), rand(0, 0)*rand(1, 1), -0.2);
-							polygons[i].effect2 = polygons[i].size;
+							polygons[i].setEffect2(500);
 						}
 						break;
 
@@ -275,12 +276,19 @@
 						rectangleEditor = new roundRectangle(canvas.width*2/3, canvas.height*2/3, new color(0, 255, 0));
 						for (var i=0; i<4; i++) {
 							polygons[i] = new polygon(new point(canvas.width/12, canvas.height*(3+i)/9), 3+i, 30, new color(255, 255, 255), polygonColor(i), Math.PI*3/2, 0, 0, 0);
+							polygons[i].setEffect2(200);
+						}
+						for (var i=0; i<placedPolygons.length; i++) {
+							placedPolygons[i].setEffect2(200);
 						}
 						myBall = new ball(myBallCenter, 10, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 						gravity = 0;
 						break;
 
 						case "playing":
+							for (var i=0; i<placedPolygons.length; i++) {
+								placedPolygons[i].setEffect2(200);
+							}
 							myBall = new ball(myBallCenter, 10, new color(255, 255, 255), new color(0, 255, 0), 0, 0);
 							break;
 				}
@@ -331,6 +339,12 @@
 							gravity = 0;
 						}
 					}
+					if (key == 107) { //tasto +
+						gravity += 0.1
+					}
+					if (key == 109) { //tasto - 
+						gravity -= 0.1
+					}
 				}
 				if (gameState == "editor") {
 					for (var i=0; i<placedPolygons.length; i++) {
@@ -342,6 +356,7 @@
 								placedPolygons[i].rotation -= Math.PI/12;
 						}
 					}
+
 				}
 			}
 
@@ -399,8 +414,8 @@
 				if (gameState == "playing") {
 					if (mouseInCircle(myBall)) {
 						ballClicked = true;
+						myBall.line = true;
 					}
-					myBall.line = true;
 				}
 			}
 
@@ -416,11 +431,13 @@
 								//sto trascianndo un nuovo poligono
 								placedPolygons[npp] = clonePolygon(draggedPolygon);
 								placedPolygons[npp].center = mousePoint;
+								placedPolygons[npp].setEffect2(200);
 								npp = findFreeSpot();
 							}
 							else {
 								//sto trascinando un poligono già piazzato
 								placedPolygons[draggingIndex].center = mousePoint;
+								placedPolygons[draggingIndex].setEffect2(200);
 								draggingIndex = -1;
 							}
 						}
