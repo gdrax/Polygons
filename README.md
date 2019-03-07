@@ -1,4 +1,4 @@
-# test
+# Polygons
 Javascript level editor, with polygons and a ball
 
 Place the polygons on the rectangle and change their size by scrolling the mouse wheel, and place the ball.
